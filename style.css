@@ -1,0 +1,694 @@
+/*
+ Theme Name:   medi& GENSEN Child
+ Theme URI:    (あなたのサイトのURLや、空でもOK)
+ Description:  medi&サイト用 GENSEN子テーマ
+ Author:       (あなたのお名前やニックネーム)
+ Author URI:   (あなたのサイトのURLや、空でもOK)
+ Template:     gensen_tcd050
+ Version:      1.0.0
+ Text Domain:  gensen_tcd050-child
+*/
+
+/* この下に子テーマ独自のCSSを記述していきます */
+
+/* ----------------------------------------------------------------------
+   1. ヘッダー (.site-header-custom)
+---------------------------------------------------------------------- */
+.site-header-custom {
+    /* background-color: transparent; */ /* 背景画像を設定するので、transparentは不要またはコメントアウト */
+    background-image: url('assets/images/header_bg.png'); /* 背景画像のパスを指定 */
+    background-repeat: repeat; /* 画像を繰り返すか (Figmaのデザインによる: repeat, no-repeat, repeat-x, repeat-y) */
+    background-position: center center; /* 背景画像の位置 (Figmaのデザインによる) */
+    background-size: cover; /* 背景画像のサイズ調整 (Figmaのデザインによる: cover, contain, auto, or specific size) */
+    padding: 12px 0; /* ヘッダー上下の余白 (Figmaに合わせて調整) */
+    /* border-bottom: 1px solid #f0f0f0; */ /* 背景画像によっては不要になるか、色を調整 */
+    /* box-shadow: 0 1px 3px rgba(0,0,0,0.04); */ /* 背景画像によっては不要になるか、調整 */
+    position: sticky; /* ヘッダーを上部に固定する場合 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* 他の要素より手前に表示 */
+    box-sizing: border-box;
+    transition: background-color 0.3s ease; /* スクロール時に背景色を変える場合のスムーズな変化のため */
+}
+
+/* WordPress管理バー表示時の固定ヘッダーのtop位置調整 */
+body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラスはheader.phpで条件分岐で付与 */
+    top: 32px;
+}
+@media screen and (max-width: 782px) {
+    body.admin-bar .site-header-custom.is-fixed-header {
+        top: 46px;
+    }
+}
+
+.site-header-custom__container {
+    max-width: 1140px; /* サイト全体のコンテンツ幅と合わせる */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.site-header-custom__inner {
+    display: flex;
+    justify-content: space-between; /* ロゴとナビゲーションを両端に配置 */
+    align-items: center; /* 垂直方向中央揃え */
+}
+
+.site-header-custom__logo-link {
+    display: inline-block;
+}
+
+.site-header-custom__logo-img {
+    height: 35px; /* ロゴの高さ (Figmaに合わせて調整) */
+    width: auto;
+    display: block;
+}
+
+.site-header-custom__nav {
+    /* ナビゲーション全体のラッパー */
+}
+
+.site-header-custom__menu { /* wp_nav_menu で出力される ul タグのクラス */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* メニュー項目を横並びにする */
+}
+
+.site-header-custom__menu li {
+    margin-left: 30px; /* メニュー項目間の余白 (Figmaに合わせて調整) */
+}
+.site-header-custom__menu li:first-child {
+    margin-left: 0;
+}
+
+.site-header-custom__menu a {
+    text-decoration: none;
+    color: #333; /* メニュー文字色 (Figmaに合わせて調整) */
+    font-weight: 500; /* Figmaに合わせて調整 (例: 通常 or 少し太め) */
+    font-size: 15px; /* Figmaに合わせて調整 */
+    padding: 10px 5px; /* クリック範囲と見た目のための余白 */
+    position: relative; /* ホバーエフェクト用 */
+    transition: color 0.2s ease-in-out;
+}
+
+.site-header-custom__menu a:hover,
+.site-header-custom__menu .current-menu-item > a,
+.site-header-custom__menu .current-menu-ancestor > a { /* 現在のページや親ページ */
+    color: #A052D8; /* ホバー時やカレントページの文字色 (Figmaのアクセントカラーなど) */
+}
+
+/* メニュー項目の下にアクセントラインを引く場合 (任意) */
+.site-header-custom__menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; /* 下線の位置 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px; /* 下線の太さ */
+    background-color: #A052D8; /* 下線の色 */
+    transition: width 0.3s ease-in-out;
+}
+.site-header-custom__menu a:hover::after,
+.site-header-custom__menu .current-menu-item > a::after,
+.site-header-custom__menu .current-menu-ancestor > a::after {
+    width: 100%; /* ホバー時/アクティブ時に下線を表示 */
+}
+
+/* モバイル用のハンバーガーメニューのスタイルは別途記述 (今はPC表示を優先) */
+.site-header-custom__toggle {
+    display: none; /* デフォルトでは非表示 */
+    /* ...ハンバーガーボタンのスタイル... */
+}
+
+/* ----------------------------------------------------------------------
+   4. フッター (.site-footer-custom)
+---------------------------------------------------------------------- */
+.site-footer-custom {
+    background-color: #2C2C2C; /* Figmaのフッター背景色 (スクリーンショットから濃いグレー/黒系と判断) */
+    color: #adb5bd; /* Figmaのフッター基本文字色 (薄めのグレー) */
+    padding: 60px 0 30px; /* 上下の余白 (Figmaに合わせて調整) */
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.site-footer-custom__container {
+    /* .container クラスの汎用スタイルが適用される想定 */
+    /* max-width: 1140px; */
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    /* padding-left: 15px; */
+    /* padding-right: 15px; */
+}
+
+.site-footer-custom__inner {
+    /* フッターコンテンツ全体をさらにラップする場合 */
+}
+
+.site-footer-custom__logo-area {
+    margin-bottom: 40px; /* ロゴエリアの下の余白 */
+    text-align: left; /* Figmaのデザインでは左寄せに見えます */
+}
+/* もし中央寄せにしたい場合: */
+/* .site-footer-custom__logo-area {
+    text-align: center;
+} */
+
+.site-footer-custom__logo-link {}
+.site-footer-custom__logo-img {
+    max-height: 35px; /* フッターロゴの高さ (Figmaに合わせて調整) */
+    width: auto;
+    /* ロゴが暗い背景で白く見えるようにする必要があれば filter を使うか、別画像を用意 */
+    /* filter: brightness(0) invert(1); */
+}
+
+.site-footer-custom__nav-widgets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3つのリンクリスト列 */
+    gap: 40px; /* 各ウィジェット間の隙間 (Figmaに合わせて調整) */
+    margin-bottom: 50px; /* コピーライトエリアとの間隔 */
+    padding-top: 30px; /* ロゴエリアとの間に線を入れるなら、その下のスペース */
+    border-top: 1px solid #495057; /* ロゴエリアとナビゲーションの間に区切り線 (Figmaに合わせて色を調整) */
+}
+
+.footer-category-widget {} /* 各リンクリスト列のラッパー */
+
+.footer-category-widget__title {
+    font-size: 16px; /* Figmaに合わせて調整 (例: ヘッダーのメニューより少し小さいなど) */
+    font-weight: 600; /* やや太め */
+    color: #fff; /* Figmaのフッター見出し色に合わせて */
+    margin-top: 0;
+    margin-bottom: 20px; /* リストとの間隔 */
+    padding-bottom: 10px; /* 見出し下の区切り線との間隔 */
+    border-bottom: 1px solid #555; /* 見出し下の区切り線 (Figmaに合わせて色と太さを調整) */
+}
+
+.footer-category-widget__menu { /* wp_nav_menu で出力される ul タグのクラス */
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+.footer-category-widget__menu li {
+    margin-bottom: 10px; /* 各リンク項目の下の余白 */
+}
+.footer-category-widget__menu li:last-child {
+    margin-bottom: 0;
+}
+
+.footer-category-widget__menu a {
+    color: #adb5bd; /* Figmaのフッターリンク色 (基本文字色と同じか少し明るめ) */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.footer-category-widget__menu a:hover {
+    color: #fff; /* ホバー時のリンク色 */
+    /* text-decoration: underline; */ /* ホバー時に下線をつける場合 */
+}
+
+.site-footer-custom__bottom {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid #495057; /* フッターナビとコピーライトの間の区切り線 */
+    font-size: 13px;
+    color: #868e96; /* コピーライトの文字色 (Figmaに合わせて調整) */
+}
+.site-footer-custom__copyright {}
+
+
+/* --- レスポンシブ対応 (フッター部分) --- */
+@media (max-width: 992px) { /* タブレットなど */
+    .site-footer-custom__nav-widgets {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* カラム数を自動調整 */
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) { /* スマホなど */
+    .site-footer-custom__logo-area {
+        text-align: center; /* スマホではロゴを中央寄せにするなど */
+        margin-bottom: 30px;
+    }
+    .site-footer-custom__nav-widgets {
+        grid-template-columns: 1fr; /* スマホでは1カラムに */
+        gap: 25px;
+        padding-top: 25px;
+        margin-bottom: 30px;
+    }
+    .footer-category-widget {
+        margin-bottom: 25px; /* 各カテゴリリスト間の余白 */
+    }
+    .footer-category-widget:last-child {
+        margin-bottom: 0;
+    }
+    .site-footer-custom__bottom {
+        padding-top: 25px;
+        font-size: 12px;
+    }
+}
+
+/* --- 2. シングル店舗ページ (.single-store) 共通スタイル --- */
+.content-area--single-store {
+    padding-top: 40px; /* ヘッダーとの余白 */
+    padding-bottom: 60px; /* フッターとの余白 */
+    max-width: 1280px; /* 最大幅を設定 */
+    margin-left: auto; /* 中央寄せ */
+    margin-right: auto; /* 中央寄せ */
+    box-sizing: border-box; /* paddingを含めてmax-widthを計算 */
+}
+
+.store-article {
+    background-color: transparent; /* 記事全体の背景はなしに (各セクションで設定) */
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.store-article__section {
+    margin-bottom: 60px; /* 各主要セクション間の下の余白 (Figmaに合わせて調整) */
+}
+.store-article__section:last-child {
+    margin-bottom: 0;
+}
+
+.store-article__section-title { /* 「店舗情報」「Map」「関連記事」などの大見出し */
+    font-size: 26px; /* Figmaに合わせて調整 */
+    font-weight: 700; /* 太字 */
+    color: #333; /* Figmaの見出し色に合わせて */
+    margin-top: 0;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e5e5e5; /* Figmaの区切り線の色・太さ */
+    position: relative;
+}
+
+/* 大見出しの下のアクセントライン (任意) */
+/* .store-article__section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px; /* border-bottomと重なるように */
+/* width: 70px; /* 線の長さ */
+/* height: 2px; /* 線の太さ */
+/* background-color: #C792EA; /* アクセントカラー (Figmaに合わせて) */
+/* } */
+
+
+.store-article__section-title-sub { /* 左カラムキャッチコピーや右カラム内の小見出し */
+    font-size: 20px; /* Figmaに合わせて調整 */
+    font-weight: 600;
+    color: #444; /* Figmaに合わせて調整 */
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+
+/* --- 2A. ヒーローセクション (.store-hero) --- */
+.store-hero {
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    color: #fff;
+    position: relative;
+    min-height: 600px; /* Figmaのデザインに合わせて高さを調整 */
+    display: flex;
+    align-items: flex-end; /* 内容を下揃えに */
+    padding: 40px 50px; /* 内側の余白 (Figmaに合わせて調整) */
+    box-sizing: border-box;
+    border-radius: 0; /* Figmaで角丸がなければ0に */
+    overflow: hidden;
+    margin: -30px -30px 50px -30px; /* .store-article のパディングを打ち消して全幅にする場合 (親のpaddingに注意) */
+                                     /* もし .store-article にパディングがなければ margin: 0 0 50px 0; など */
+}
+/* .store-article のpaddingが0の場合、またはヒーローをサイト幅いっぱいにしたい場合 */
+@media (min-width: 1140px) { /* .container の max-width に合わせる */
+    .store-hero {
+        /* margin-left: calc((100vw - 1140px) / -2); */ /* .container の左右paddingも考慮 */
+        /* margin-right: calc((100vw - 1140px) / -2); */
+        /* 上記は複雑なので、ヒーローセクションを .container の外に出すHTML構造の方が管理しやすいかも */
+    }
+}
+
+
+.store-hero.no-background-image { /* アイキャッチがない場合 */
+    min-height: auto;
+    background-color: #f0f4f8; /* 代わりの背景色 */
+    padding-top: 80px;
+    padding-bottom: 80px;
+    color: #333;
+}
+
+.store-hero::before { /* オーバーレイ */
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0) 100%); /* 下から濃くなるグラデーション */
+    z-index: 1;
+}
+.store-hero.no-background-image::before { display:none; }
+
+.store-hero__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.store-hero__name {
+    font-size: 42px; /* Figmaに合わせて調整 */
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.25;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+.store-hero.no-background-image .store-hero__name { color: #2c3e50; text-shadow: none; }
+
+.store-hero__location {
+    font-size: 17px; /* Figmaに合わせて調整 */
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    color: #e0e0e0; /* Figmaに合わせて調整 (背景が暗いので明るめの色) */
+}
+.store-hero.no-background-image .store-hero__location { color: #555; }
+
+.store-hero__location-icon {
+    width: 18px;
+    height: auto;
+    margin-right: 10px;
+    filter: brightness(0) invert(1); /* アイコンが黒いPNGの場合、白くする */
+}
+.store-hero.no-background-image .store-hero__location-icon { filter: none; }
+
+/* style.css のヒーローセクションSNSアイコン部分を以下のように修正または追記 */
+
+.store-hero__social {
+    display: flex;
+    gap: 12px; /* アイコン間の隙間 (Figmaに合わせて調整) */
+}
+
+.store-hero__social-link { /* a タグにスタイルを適用 */
+    display: flex; /* 中のimgを中央揃えにするため */
+    align-items: center;
+    justify-content: center;
+    width: 36px;  /* 白い丸の直径 (Figmaに合わせて調整) */
+    height: 36px; /* 白い丸の直径 (Figmaに合わせて調整) */
+    background-color: rgba(255, 255, 255, 0.9); /* 白い丸背景 (少し透明度を持たせる場合) */
+    /* background-color: #fff; */ /* 完全な白の場合 */
+    border-radius: 50%; /* これで正円になります */
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* 任意: 丸背景に少し影をつける場合 */
+}
+
+.store-hero__social-link:hover {
+    background-color: #fff; /* ホバー時に背景を不透明な白にするなど */
+    transform: scale(1.1); /* ホバー時に少し大きくする */
+}
+
+.store-hero__social-link img.store-hero__social-icon {
+    width: 20px;  /* アイコン自体のサイズ (白い丸より小さく) */
+    height: 20px; /* アイコン自体のサイズ */
+    display: block; /* 余計な余白対策 */
+    /* filter: brightness(0) invert(1); /* アイコンが黒いPNGで、背景が暗い場合に白く見せるためのものでしたが、白い丸背景なので不要になるか、調整が必要です */
+    /* もしアイコン画像が元々透明背景で、色をCSSで制御したい場合はSVGアイコンが適しています */
+}
+
+
+/* --- 2B. 2カラムセクション (.store-article__two-column-section) --- */
+.store-article__two-column-section {
+    display: flex;
+    flex-wrap: wrap; /* スマホなどで縦積みになるように */
+    gap: 30px; /* カラム間の主要な隙間 */
+    align-items: flex-start; /* カラムの高さを揃えるのではなく、上端を揃える */
+    padding-left: 15px; /* コンテナ左右の余白 (適宜調整) */
+    padding-right: 15px; /* コンテナ左右の余白 (適宜調整) */
+    max-width: 1240px; /* 最大幅を設定 */
+    margin-left: auto; /* 中央寄せ */
+    margin-right: auto; /* 中央寄せ */
+    box-sizing: border-box; /* paddingを含めてmax-widthを計算 */
+}
+
+/* --- 左カラム (.store-article__left-column) --- */
+.store-article__left-column {
+    flex: 1;
+    min-width: 300px;
+    flex-basis: calc(60% - 15px); /* 幅の目安 (gapを考慮) */
+    /* 左カラム自体の背景や枠線はFigmaデザインになさそうなので削除またはコメントアウト */
+}
+
+    .store-recommended-photo {
+        margin-bottom: 25px;
+    }
+    .store-recommended-photo__image {
+        width: 100%;
+        height: auto;
+        border-radius: 0; /* 角丸をなくす */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Figmaに合わせて調整 */
+        display: block;
+    }
+    /* .store-recommended-photo__placeholder (変更なし) */
+
+    .store-catchphrase {}
+    .store-catchphrase__title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+        position: relative; /* 下線のため */
+        padding-bottom: 8px; /* 下線のためのスペース */
+        display: inline-block; /* 下線がテキスト幅に合うように */
+    }
+    .store-catchphrase__title::after { /* タイトル下のアクセントライン */
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%; /* テキスト幅に合わせる */
+        height: 2px;
+        background: linear-gradient(to right, #DDA0DD, #B05DBA, #8A2BE2); /* サイドバーに合わせたグラデーション */
+    }
+
+    .store-catchphrase__detail {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #555;
+    }
+    .store-catchphrase__detail p:last-child { margin-bottom: 0; }
+
+
+/* --- 右カラム (.store-article__right-column) --- */
+.store-article__right-column {
+    flex: 1;
+    min-width: 280px; /* 最小幅 */
+    flex-basis: calc(38% - 15px); /* 幅の目安 (Figmaと左カラムのバランスを見て調整) */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* 各ウィジェット間の隙間 */
+}
+
+    /* 右カラムの各情報ブロック（カード風）の共通スタイル */
+    .store-sidebar-widget {
+        background-color: #fff; /* カードの背景色 */
+        padding: 25px 25px 25px 35px; /* 上 右 下 左 (左のアクセントライン用に左パディングを多めに) */
+        border: 1px solid #D8BFD8; /* ウィジェット全体の枠線 (薄い紫色系) */
+        border-radius: 12px; /* カードの角丸を少し大きく */
+        position: relative;
+        overflow: hidden; /* アクセントラインが角丸からはみ出ないように */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06); /* 少し影を調整 */
+    }
+    .store-sidebar-widget::before { /* 左のアクセントカラーの縦線 */
+        content: '';
+        position: absolute;
+        top: 20px; /* 枠線との隙間を考慮して調整 */
+        left: 15px; /* 枠線との隙間を考慮して調整 */
+        width: 5px; /* 縦線の太さ */
+        height: calc(100% - 40px); /* 上下のpaddingを考慮 */
+        background: linear-gradient(to bottom, #DDA0DD, #B05DBA, #8A2BE2); 
+        border-radius: 2.5px; /* 縦線の角も少し丸く */
+    }
+
+    /* 「お店について」ブロックのタイトル (今回は使用しないのでコメントアウト) */
+    /* .store-sidebar-widget--contact .store-sidebar-widget__title {
+        font-size: 16px; 
+        font-weight: 700; 
+        color: #333;
+        margin-top: 0;
+        margin-bottom: 18px; 
+        text-align: left; 
+    } */
+
+    .store-sidebar-widget__phone {
+        font-size: 22px; /* Figmaに合わせて調整 */
+        font-weight: 700;
+        color: #2c3e50; /* Figmaに合わせて調整 */
+        margin-bottom: 8px; /* 「予約サイト」見出しとの間隔 */
+        display: flex;
+        align-items: center;
+        text-decoration: none; /* 電話番号にリンクを貼る場合の下線消し */
+    }
+    .store-sidebar-widget__phone::before { /* 電話アイコン */
+        content: '';
+        display: inline-block;
+        width: 18px; /* Figmaに合わせて調整 */
+        height: 18px; /* Figmaに合わせて調整 */
+        background-image: url('assets/icons/phone.png'); /* assets/icons/phone.png を用意 */
+        background-size: contain;
+        background-repeat: no-repeat;
+        margin-right: 10px;
+        filter: invert(50%) sepia(50%) saturate(500%) hue-rotate(250deg) brightness(90%) contrast(90%); /* アイコンを紫系にする例 (調整が必要) */
+    }
+
+    .store-sidebar-widget__reservation-title { /* 「予約サイト」の小さな見出し */
+        font-size: 11px; /* Figmaに合わせて調整 */
+        font-weight: 600; /* やや太め */
+        color: #888; /* Figmaに合わせて調整 (グレー系) */
+        text-transform: uppercase; /* 大文字 */
+        letter-spacing: 0.5px;
+        margin-top: 0; /* 上マージン削除 */
+        margin-bottom: 10px; /* ボタンとのマージン調整 */
+    }
+
+    .store-sidebar-widget__button.button--reservation {
+        display: block;
+        background: linear-gradient(135deg, #DDA0DD, #B05DBA); /* Figmaの紫系グラデーション (正確な色コードに) */
+        color: #fff;
+        text-align: center;
+        padding: 12px 15px; /* パディング調整 */
+        text-decoration: none;
+        border-radius: 8px; /* 角丸調整 */
+        font-weight: bold;
+        font-size: 15px; /* フォントサイズ調整 */
+        transition: all 0.25s ease-out;
+        box-shadow: 0 2px 4px rgba(176, 93, 186, 0.3); /* ボタンの影 (Figmaに合わせて) */
+        margin-bottom: 25px; /* 下のセクションとのマージン */
+    }
+    .store-sidebar-widget__button.button--reservation:hover {
+        opacity: 0.9;
+        box-shadow: 0 3px 7px rgba(176, 93, 186, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* 「アクセス」「営業時間」などの情報セクションのラッパーは削除またはスタイル調整 */
+    /* .store-sidebar-widget--info-sections {
+        padding-left: 15px;
+    } */
+
+    .store-info-section { /* 各情報ブロック (アクセス、営業時間など) */
+        padding: 15px 0;
+        padding-left: 15px; /* 左のアクセントラインからの距離を確保 */
+        position: relative; /* 下線のため */
+    }
+    /* 各情報ブロックの間に区切り線 (最後の要素以外) */
+    .store-sidebar-widget > .store-info-section:not(:last-of-type):not(.store-info-section--reservation) { 
+         border-bottom: 1px solid #f0f0f0; /* Figmaの細い区切り線の色 */
+    }
+     /* もしHTML構造がウィジェットごとに分かれているなら、ウィジェット間のマージンで調整 */
+
+
+    .store-info-section__title { /* 各情報セクションの見出し（アクセス、営業時間など） */
+        font-size: 14px; /* フォントサイズ調整 */
+        font-weight: 700; /* 太字 */
+        color: #333; /* 文字色調整 */
+        margin: 0 0 8px 0; /* 値との間隔 */
+        text-transform: none; /* 大文字化解除 */
+        letter-spacing: 0.2px; /* 字間調整 */
+        position: relative;
+        padding-bottom: 5px; /* 下線のためのスペース */
+        display: inline-block; /* 下線がテキスト幅に合うように */
+    }
+    .store-info-section__title::after { /* タイトル下のアクセントライン */
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%; /* テキスト幅に合わせる */
+        height: 2px;
+        background: linear-gradient(to right, #DDA0DD, #B05DBA, #8A2BE2); /* 画像に合わせたグラデーション */
+    }
+
+    .store-info-section__content,
+    .store-info-section__list {
+        font-size: 15px; /* Figmaに合わせて調整 */
+        color: #333; /* Figmaに合わせて調整 */
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+    .store-info-section__list { list-style: none; padding: 0; margin: 0; }
+    .store-info-section__list li { margin-bottom: 4px; }
+    .store-info-section__list li:last-child { margin-bottom: 0; }
+
+
+    .store-sidebar-widget--wifi .store-info-section__content {
+        display: flex;
+        align-items: center;
+    }
+    /* .wifi-icon { ... } */ /* HTMLにアイコンを追加した場合のスタイル */
+
+    /* .store-sidebar-widget--wifi .wifi-icon { width: 18px; height: auto; margin-right: 6px; } */
+
+
+/* --- 2C. アイキャッチ2 (.store-article__eyecatch2) --- */
+.store-article__eyecatch2 {
+    background: transparent; padding: 0; box-shadow: none; border-radius: 0;
+    margin-top: 50px; margin-bottom: 50px; text-align: center;
+}
+.store-eyecatch2__image { max-width: 100%; height: auto; border-radius: 0; display: block; margin: 0 auto; } /* Figmaで角丸なし、影なしなら */
+
+
+/* --- 2D. 店舗情報詳細テーブル (.store-details-list) --- */
+.store-article__details.store-article__section {
+    background-color: #fff; padding: 30px; border-radius: 12px;
+    border: 1px solid #e9ecef; box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+    max-width: 1280px; /* 最大幅を設定 */
+    margin-left: auto; /* 中央寄せ */
+    margin-right: auto; /* 中央寄せ */
+    box-sizing: border-box; /* paddingを含めてmax-widthを計算 */
+}
+.store-details-list { list-style: none; padding-left: 0; margin-top: 0; }
+.store-details-list__item {
+    display: flex; flex-wrap: wrap; padding: 18px 0;
+    border-bottom: 1px solid #f0f0f0; font-size: 16px; line-height: 1.7;
+}
+.store-details-list__item:last-child { border-bottom: none; }
+.store-details-list__term { font-weight: 600; color: #495057; width: 200px; flex-shrink: 0; padding-right: 20px; box-sizing: border-box; }
+.store-details-list__description { color: #212529; flex-grow: 1; margin-left: 0; word-break: break-word; }
+.store-details-list__description a { color: #007bff; text-decoration: none; }
+.store-details-list__description a:hover { text-decoration: underline; }
+
+
+/* --- 2E. Mapセクション (.store-article__map) --- */
+.store-article__map.store-article__section { 
+    background-color: transparent; 
+    padding:0; 
+    box-shadow: none; 
+    border: none; 
+    max-width: 1280px; /* 最大幅を設定 */
+    margin-left: auto; /* 中央寄せ */
+    margin-right: auto; /* 中央寄せ */
+    box-sizing: border-box; /* paddingを含めてmax-widthを計算 */
+}
+.map-container iframe { border: 1px solid #dee2e6; width: 100%; height: 400px; display: block; border-radius: 12px; }
+
+
+/* --- 2F. 関連記事セクション (.store-article__related-posts) --- */
+.store-article__related-posts.store-article__section { background-color: transparent; padding:0; box-shadow: none; border: none; }
+.related-posts__container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+.related-post__item {
+    background: #fff; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none; color: inherit; display: block;
+}
+.related-post__item:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.12); }
+.related-post__thumbnail-wrapper { height: 160px; overflow: hidden; background-color: #f5f5f5; }
+.related-post__thumbnail { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.related-post__item:hover .related-post__thumbnail { transform: scale(1.05); }
+.related-post__thumbnail-placeholder { height: 160px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px; }
+.related-post__content { padding: 15px; }
+.related-post__title { font-size: 17px; font-weight: 600; margin: 0 0 8px; color: #333; line-height: 1.4; }
+.related-post__location { font-size: 13px; color: #777; display: flex; align-items: center; margin: 0 0 8px; }
+.related-post__location-icon { width: 12px; height: 12px; margin-right: 6px; }
+.store-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; } /* 関連記事カード内のジャンルタグ表示用 */
+.store-tag { background: #f0f0f0; padding: 3px 8px; border-radius: 4px; font-size: 11px; color: #666; }
