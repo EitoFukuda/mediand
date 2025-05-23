@@ -168,35 +168,7 @@ add_action( 'pre_get_posts', 'medi_gensen_child_customize_search_query', 15 );
 
 // functions.phpに以下を追加
 
-/**
- * ACF オプションページの設定
- */
-if( function_exists('acf_add_options_page') ) {
-    
-    // メインオプションページ
-    acf_add_options_page(array(
-        'page_title'    => 'medi& サイト設定',
-        'menu_title'    => 'サイト設定',
-        'menu_slug'     => 'medi-site-settings',
-        'capability'    => 'edit_posts',
-        'icon_url'      => 'dashicons-admin-customizer',
-        'position'      => 30,
-    ));
-    
-    // サブページ：トップページ設定
-    acf_add_options_sub_pageS(array(
-        'page_title'    => 'トップページ設定',
-        'menu_title'    => 'トップページ',
-        'parent_slug'   => 'medi-site-settings',
-    ));
-    
-    // サブページ：広告・お知らせ設定
-    acf_add_options_sub_pageS(array(
-        'page_title'    => '広告・お知らせ設定',
-        'menu_title'    => '広告・お知らせ',
-        'parent_slug'   => 'medi-site-settings',
-    ));
-}
+
 
 /**
  * カスタムサイドバーの登録

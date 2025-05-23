@@ -332,11 +332,27 @@ $genre_terms = get_terms(array(
                 </div>
             <?php endif; ?>
 
-            <?php // TCDのお知らせ機能 ?>
-            <?php if (function_exists('tcd_get_news_list')) : ?>
+            <?php // お知らせ機能 ?>
+            <?php
+            $news_query = new WP_Query(array(
+                'post_type' => 'news',
+                'posts_per_page' => 5,
+                'orderby' => 'date',
+                'order' => 'DESC'
+            ));
+            if ($news_query->have_posts()) : ?>
                 <div class="sidebar-news-section">
                     <h3 class="sidebar-section-title">お知らせ</h3>
-                    <?php tcd_get_news_list(5); ?>
+                    <ul class="news-list">
+                        <?php while ($news_query->have_posts()) : $news_query->the_post(); ?>
+                            <li class="news-item">
+                                <a href="<?php the_permalink(); ?>">
+                                    <span class="news-date"><?php echo get_the_date(); ?></span>
+                                    <span class="news-title"><?php the_title(); ?></span>
+                                </a>
+                            </li>
+                        <?php endwhile; wp_reset_postdata(); ?>
+                    </ul>
                 </div>
             <?php endif; ?>
 
