@@ -1,137 +1,275 @@
 jQuery(document).ready(function($) {
+    console.log('[Archive Filters] Complete version loaded');
 
     // --- タブ切り替え機能 ---
     const $tabs = $('.store-search-tabs__item');
     const $filterPanels = $('.store-search-filter-panel');
-    console.log('[Archive Filters] Tabs found:', $tabs.length);
-    console.log('[Archive Filters] Filter panels found:', $filterPanels.length);
+    
+    console.log('[Archive Filters] Found tabs:', $tabs.length, 'panels:', $filterPanels.length);
 
-    // 初期表示時のアクティブタブとパネルを設定
-    // URLにアクティブなタブを示すパラメータがあればそれを優先、なければ最初のタブ
-    const urlParams = new URLSearchParams(window.location.search);
-    let activeTabFromUrl = urlParams.get('active_tab');
-
-    // URLにactive_tabパラメータがない場合、または該当するタブがない場合は、最初のタブをデフォルトにする
-    if (!activeTabFromUrl || $tabs.filter('[data-tab-target="#filter-' + activeTabFromUrl + '"]').length === 0) {
-        if ($tabs.length > 0) {
-            activeTabFromUrl = $tabs.first().data('tab-target').substring(1); // #filter-region から filter-region を取得
+    // 初期表示設定
+    function initializeTabs() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let activeTab = urlParams.get('active_tab') || 'region';
+        
+        console.log('[Archive Filters] URL active_tab parameter:', activeTab);
+        
+        // 全てのタブとパネルをリセット
+        $tabs.removeClass('is-active');
+        $filterPanels.removeClass('is-active').hide();
+        
+        // アクティブなタブとパネルを表示
+        const $activeTab = $tabs.filter(`[data-tab-target="#filter-${activeTab}"]`);
+        const $activePanel = $(`#filter-${activeTab}`);
+        
+        if ($activeTab.length && $activePanel.length) {
+            $activeTab.addClass('is-active');
+            $activePanel.addClass('is-active').show();
+            console.log('[Archive Filters] Active tab set to:', activeTab);
+        } else {
+            // フォールバック：最初のタブを表示
+            const firstTab = $tabs.first();
+            const firstPanel = $filterPanels.first();
+            
+            if (firstTab.length && firstPanel.length) {
+                firstTab.addClass('is-active');
+                firstPanel.addClass('is-active').show();
+                
+                const firstTabName = firstTab.data('tab-target')?.replace('#filter-', '') || 'region';
+                $('.active-tab-input').val(firstTabName);
+                console.log('[Archive Filters] Fallback to first tab:', firstTabName);
+            }
         }
     }
 
-    if (activeTabFromUrl && $tabs.length > 0 && $filterPanels.length > 0) {
-        $tabs.removeClass('is-active');
-        $filterPanels.removeClass('is-active').hide(); // 一旦すべて隠す
-
-        $tabs.filter('[data-tab-target="#filter-' + activeTabFromUrl + '"]').addClass('is-active');
-        $('#filter-' + activeTabFromUrl).addClass('is-active').show(); // URLまたは最初のタブに対応するパネルを表示
-    }
-
-
-    $tabs.on('click', function(event) {
-        event.preventDefault();
-        console.log('[Archive Filters] Tab clicked:', $(this).text().trim()); // クリックされたタブのテキスト
-        const targetPanelId = $(this).data('tab-target');
-        console.log('[Archive Filters] Target panel ID:', targetPanelId);
-
-        if (!$(this).hasClass('is-active')) {
-            console.log('[Archive Filters] Clicked tab is not active. Processing...');
+    // タブクリックイベント
+    $tabs.on('click', function(e) {
+        e.preventDefault();
+        
+        const $clickedTab = $(this);
+        const targetPanelId = $clickedTab.data('tab-target');
+        
+        console.log('[Archive Filters] Tab clicked:', $clickedTab.text().trim(), 'Target:', targetPanelId);
+        
+        if (!$clickedTab.hasClass('is-active')) {
+            console.log('[Archive Filters] Switching to tab:', targetPanelId);
+            
+            // タブ切り替えアニメーション
             $tabs.removeClass('is-active');
             $filterPanels.removeClass('is-active').slideUp(200);
-            console.log('[Archive Filters] All tabs and panels deactivated.');
-
-            $(this).addClass('is-active');
+            
+            // 新しいタブをアクティブに
+            $clickedTab.addClass('is-active');
             $(targetPanelId).addClass('is-active').slideDown(300);
-            console.log('[Archive Filters] Clicked tab and target panel activated:', targetPanelId);
-
-            // 新しいURLパラメータを生成（オプション）
-            const newUrlParams = new URLSearchParams(window.location.search);
-            newUrlParams.set('active_tab', targetPanelId.substring(1)); // #を除いたID
-            // history.pushState(null, '', window.location.pathname + '?' + newUrlParams.toString()); // URLを書き換える場合（ページリロードなし）
+            
+            // hidden inputを更新
+            const tabName = targetPanelId.replace('#filter-', '');
+            $('.active-tab-input').val(tabName);
+            
+            console.log('[Archive Filters] Tab switch completed:', tabName);
         }
     });
 
-    // --- 「地域から選ぶ」タブ内の地方→都道府県 連動表示機能 ---
-    const $regionButtons = $('.filter-button.filter-button--region');
+    // --- 地域フィルター機能 ---
+    const $regionButtons = $('.filter-button--region');
     const $prefectureGroups = $('.filter-region__prefecture-group');
     const $prefecturesPlaceholder = $('.filter-region__prefectures-placeholder');
-    console.log('[Archive Filters] Region buttons found:', $regionButtons.length); // filter-button--region にクラス名を変更したためセレクタ修正
-
+    
+    console.log('[Archive Filters] Region setup - Buttons:', $regionButtons.length, 'Groups:', $prefectureGroups.length);
+    
+    // 地域ボタンクリックイベント
     $regionButtons.on('click', function() {
-        const selectedRegionId = $(this).data('region-id');
-        console.log('[Archive Filters] Region button clicked. Region ID:', selectedRegionId, 'Selected text:', $(this).text().trim());
-
-        if ($(this).hasClass('is-selected')) {
-            console.log('[Archive Filters] Region button already selected. Deselecting...');
-            // 再度クリックされた場合は選択解除（都道府県もリセット）
-            $(this).removeClass('is-selected');
+        const regionId = $(this).data('region-id');
+        const $button = $(this);
+        
+        console.log('[Archive Filters] Region clicked:', regionId, 'Text:', $button.text().trim());
+        
+        if ($button.hasClass('is-selected')) {
+            // 選択解除
+            console.log('[Archive Filters] Deselecting region:', regionId);
+            $button.removeClass('is-selected');
             $prefectureGroups.slideUp(200);
             $prefecturesPlaceholder.text('地方を選択してください').slideDown(200);
-            // 対応するラジオボタンの選択も解除
-            $('.filter-region__prefecture-group[data-parent-region-id="' + selectedRegionId + '"] input[type="radio"]').prop('checked', false);
-            $('.filter-region__prefecture-group[data-parent-region-id="' + selectedRegionId + '"] label.is-selected').removeClass('is-selected');
-            console.log('[Archive Filters] Radio button for prefecture changed.');
-            const currentName = $(this).attr('name');
-            $('.filter-button--radio input[name="' + currentName + '"]').closest('.filter-button--radio').removeClass('is-selected');
-            if ($(this).is(':checked')) {
-                $(this).closest('.filter-button--radio').addClass('is-selected');
-                console.log('[Archive Filters] Radio button label selected:', $(this).closest('label').text().trim());
-            }
+            
+            // 対応する都道府県選択もクリア
+            const $targetGroup = $(`[data-parent-region-id="${regionId}"]`);
+            $targetGroup.find('input[type="radio"]').prop('checked', false);
+            $targetGroup.find('.filter-button').removeClass('is-selected');
+            
+            console.log('[Archive Filters] Region deselected and prefectures cleared');
         } else {
+            // 新しい地域選択
+            console.log('[Archive Filters] Selecting new region:', regionId);
             $regionButtons.removeClass('is-selected');
-            $(this).addClass('is-selected');
-            $prefectureGroups.slideUp(200); // 他の都道府県グループを隠す
+            $button.addClass('is-selected');
+            
+            $prefectureGroups.slideUp(200);
             $prefecturesPlaceholder.slideUp(200);
-
-            const targetPrefGroup = $prefectureGroups.filter('[data-parent-region-id="' + selectedRegionId + '"]');
-            if (targetPrefGroup.length > 0 && targetPrefGroup.find('label').length > 0) { // 都道府県が存在する場合のみ表示
-                targetPrefGroup.slideDown(300);
-            } else if (targetPrefGroup.length > 0 && targetPrefGroup.find('label').length === 0) {
-                 $prefecturesPlaceholder.text('この地方の都道府県は登録されていません。').slideDown(200);
+            
+            const $targetGroup = $(`[data-parent-region-id="${regionId}"]`);
+            if ($targetGroup.length && $targetGroup.find('label').length) {
+                $targetGroup.slideDown(300);
+                console.log('[Archive Filters] Prefecture group displayed for region:', regionId);
             } else {
-                $prefecturesPlaceholder.text('都道府県が見つかりません。').slideDown(200);
+                $prefecturesPlaceholder.text('この地方の都道府県は登録されていません。').slideDown(200);
+                console.log('[Archive Filters] No prefectures found for region:', regionId);
             }
         }
     });
 
-    // ページ読み込み時に、選択されている都道府県があれば対応する地方を開く
-    const initialSelectedPrefRadio = $('input[name="prefecture_filter"]:checked');
-    if (initialSelectedPrefRadio.length > 0) {
-        const initialPrefGroup = initialSelectedPrefRadio.closest('.filter-region__prefecture-group');
-        const initialRegionId = initialPrefGroup.data('parent-region-id');
-        if (initialRegionId) {
-            $regionButtons.filter('[data-region-id="' + initialRegionId + '"]').addClass('is-selected'); // trigger('click') は不要かも
-            initialPrefGroup.show();
-            $prefecturesPlaceholder.hide();
-        }
-    } else if ($regionButtons.length > 0 && $tabs.filter('[data-tab-target="#filter-region"]').hasClass('is-active')) {
-        $prefecturesPlaceholder.show();
-    }
-
-    // --- フィルターボタン（チェックボックス/ラジオボタンのラベル）の選択状態の見た目制御 ---
-    // ラジオボタン
+    // --- フィルターボタンの選択状態管理（クリーン版） ---
+    
+    // ラジオボタン（都道府県選択）
     $('.filter-button--radio input[type="radio"]').on('change', function() {
-        const currentName = $(this).attr('name');
-        $('.filter-button--radio input[name="' + currentName + '"]').closest('.filter-button--radio').removeClass('is-selected');
+        const name = $(this).attr('name');
+        const value = $(this).val();
+        
+        console.log('[Archive Filters] Radio button changed:', name, '=', value);
+        
+        // 同じname属性のボタンの選択状態をリセット
+        $(`.filter-button--radio input[name="${name}"]`).closest('.filter-button--radio').removeClass('is-selected');
+        
+        // 選択されたボタンのスタイルを適用
         if ($(this).is(':checked')) {
             $(this).closest('.filter-button--radio').addClass('is-selected');
+            console.log('[Archive Filters] Radio selected:', value);
         }
     });
 
-    // チェックボックス
+    // チェックボックス（その他フィルター）
     $('.filter-button--checkbox input[type="checkbox"]').on('change', function() {
         const $label = $(this).closest('.filter-button--checkbox');
-        $label.toggleClass('is-selected', $(this).is(':checked'));
-        console.log('[Archive Filters] Checkbox changed. Label:', $label.text().trim(), 'Checked:', $(this).is(':checked'));
+        const isChecked = $(this).is(':checked');
+        const value = $(this).val();
+        
+        // 選択状態のクラス切り替え（チェックマークなし、背景色のみ）
+        $label.toggleClass('is-selected', isChecked);
+        
+        console.log('[Archive Filters] Checkbox changed:', value, 'Checked:', isChecked);
     });
 
-    // ページ読み込み時に、既にチェックされているもののスタイルを適用 (PHP側でクラス付与も行っているが念のため)
-    $('.filter-button input[type="checkbox"]:checked, .filter-button input[type="radio"]:checked').each(function() {
-        $(this).closest('.filter-button').addClass('is-selected');
+    // ボタンクリック時の明示的な処理（チェックマーク防止）
+    $('.filter-button--checkbox, .filter-button--radio').on('click', function(e) {
+        // デフォルトのフォーム送信を防ぐ
+        e.preventDefault();
+        
+        const $input = $(this).find('input');
+        
+        if ($input.length) {
+            if ($input.attr('type') === 'radio') {
+                // ラジオボタンの場合
+                const name = $input.attr('name');
+                $(`.filter-button input[name="${name}"]`).closest('.filter-button').removeClass('is-selected');
+                $input.prop('checked', true);
+                $(this).addClass('is-selected');
+                
+                // changeイベントをトリガー
+                $input.trigger('change');
+            } else if ($input.attr('type') === 'checkbox') {
+                // チェックボックスの場合
+                const isCurrentlyChecked = $input.is(':checked');
+                $input.prop('checked', !isCurrentlyChecked);
+                $(this).toggleClass('is-selected', !isCurrentlyChecked);
+                
+                // changeイベントをトリガー
+                $input.trigger('change');
+            }
+        }
     });
 
-    // --- 条件リセットボタン ---
-    $('.store-search-form__reset-button').on('click', function(event) {
-        event.preventDefault();
-        window.location.href = $(this).attr('href'); // パラメータなしのアーカイブページURLへ遷移
+    // --- 初期状態の選択スタイル適用 ---
+    function applyInitialStyles() {
+        $('.filter-button input:checked').each(function() {
+            $(this).closest('.filter-button').addClass('is-selected');
+            console.log('[Archive Filters] Initial selection applied:', $(this).val());
+        });
+    }
+
+    // --- 地域・都道府県の初期状態設定 ---
+    function setupInitialRegionState() {
+        const $initialSelectedPref = $('input[name="prefecture_filter"]:checked');
+        
+        if ($initialSelectedPref.length) {
+            const $initialGroup = $initialSelectedPref.closest('.filter-region__prefecture-group');
+            const initialRegionId = $initialGroup.data('parent-region-id');
+            
+            if (initialRegionId) {
+                console.log('[Archive Filters] Setting up initial region state:', initialRegionId);
+                
+                // 対応する地域ボタンを選択状態に
+                $(`.filter-button--region[data-region-id="${initialRegionId}"]`).addClass('is-selected');
+                
+                // 都道府県グループを表示
+                $initialGroup.show();
+                $prefecturesPlaceholder.hide();
+                
+                console.log('[Archive Filters] Initial region state applied');
+            }
+        } else {
+            // 初期状態では地方選択プレースホルダーを表示
+            if ($regionButtons.length > 0 && $tabs.filter('[data-tab-target="#filter-region"]').hasClass('is-active')) {
+                $prefecturesPlaceholder.show();
+            }
+        }
+    }
+
+    // --- リセットボタン ---
+    $('.store-search-form__reset-button').on('click', function(e) {
+        e.preventDefault();
+        console.log('[Archive Filters] Reset button clicked');
+        window.location.href = $(this).attr('href');
     });
+
+    // --- フォーム送信時の処理 ---
+    $('.store-search-form').on('submit', function() {
+        console.log('[Archive Filters] Form submitted');
+        
+        // 選択された値をログ出力（デバッグ用）
+        const selectedValues = {};
+        
+        $(this).find('input:checked, select').each(function() {
+            const name = $(this).attr('name');
+            const value = $(this).val();
+            if (name && value) {
+                if (!selectedValues[name]) {
+                    selectedValues[name] = [];
+                }
+                selectedValues[name].push(value);
+            }
+        });
+        
+        console.log('[Archive Filters] Selected filter values:', selectedValues);
+    });
+
+    // --- 初期化実行 ---
+    function initialize() {
+        console.log('[Archive Filters] Starting initialization...');
+        
+        // タブ初期化
+        initializeTabs();
+        
+        // 選択状態適用
+        applyInitialStyles();
+        
+        // 地域状態設定
+        setupInitialRegionState();
+        
+        console.log('[Archive Filters] Initialization completed');
+    }
+
+    // DOM準備完了後に初期化実行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+        initialize();
+    }
+
+    // --- デバッグ用：要素チェック ---
+    console.log('[Archive Filters] Debug info:');
+    console.log('- Tabs:', $tabs.length);
+    console.log('- Panels:', $filterPanels.length);
+    console.log('- Region buttons:', $regionButtons.length);
+    console.log('- Prefecture groups:', $prefectureGroups.length);
+    console.log('- Filter buttons total:', $('.filter-button').length);
+    console.log('[Archive Filters] Script loaded successfully');
 });

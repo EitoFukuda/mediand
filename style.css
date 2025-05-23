@@ -712,228 +712,603 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     font-weight: 700;
 }
 
-/* --- フィルターフォーム --- */
+/* Figmaデザイン対応：フィルタースタイル改善版 */
+
+/* --- フィルターフォーム全体 --- */
 .store-search-form {
-    background-color: #f9f9f9; /* フォーム全体の背景色 (デザイン案に合わせて調整) */
-    padding: 25px;
-    border-radius: 12px;
+    background-color: #fff; /* 白背景に変更 */
+    padding: 20px;
+    border-radius: 16px; /* より大きな角丸 */
     margin-bottom: 40px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* より目立つ影 */
+    border: 1px solid #e5e5e5;
 }
 
-/* タブリスト */
+/* --- フィルタータブ（簡素化） --- */
 .store-search-tabs__list {
     display: flex;
     list-style: none;
     padding: 0;
-    margin: 0 0 20px 0;
-    border-bottom: 1px solid #ddd; /* タブとパネルの区切り線 */
-    flex-wrap: wrap; /* スマホ表示で折り返し */
+    margin: 0 0 25px 0;
+    border-bottom: 1px solid #e5e5e5;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* 左寄せ */
+    gap: 8px; /* タブ間の隙間を調整 */
 }
 
 .store-search-tabs__item {
-    margin-right: 8px;
-    margin-bottom: -1px; /* 下のボーダーと重なるように */
-}
-.store-search-tabs__item:last-child {
-    margin-right: 0;
+    margin-right: 0; /* gapを使用するためリセット */
+    margin-bottom: -1px;
 }
 
 .store-search-tabs__item a {
     display: block;
-    padding: 12px 20px;
+    padding: 14px 24px; /* パディング調整 */
     text-decoration: none;
-    font-weight: 500;
-    border-radius: 8px 8px 0 0; /* 上部の角丸 */
-    background-color: #e9ecef; /* 非アクティブタブの背景色 */
-    color: #495057; /* 非アクティブタブの文字色 */
-    font-size: 15px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    border: 1px solid transparent;
+    font-weight: 600; /* より太い文字 */
+    border-radius: 12px 12px 0 0; /* 角丸調整 */
+    background-color: #f8f9fa; /* より明るいグレー */
+    color: #6c757d; /* より薄いグレー */
+    font-size: 14px; /* フォントサイズ調整 */
+    transition: all 0.3s ease;
+    border: 1px solid #e5e5e5;
     border-bottom: none;
+    position: relative;
 }
 
 .store-search-tabs__item.is-active a {
-    background: linear-gradient(135deg, #DDA0DD, #B05DBA); /* アクティブタブの背景グラデーション */
-    color: #fff; /* アクティブタブの文字色 */
-    border-color: #ddd;
-    border-bottom: 1px solid #f9f9f9; /* パネル背景色と同じにして切れ目なく見せる */
-}
-.store-search-tabs__item a:hover {
-    background-color: #dee2e6; /* ホバー時の背景色 (非アクティブ時) */
-    color: #343a40;
-}
-.store-search-tabs__item.is-active a:hover {
-    background: linear-gradient(135deg, #cf8ccf, #a04ca9); /* ホバー時の背景グラデーション (アクティブ時) */
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7); /* より薄い紫グラデーション */
+    color: #fff;
+    border-color: #e5e5e5;
+    border-bottom: 1px solid #fff; /* パネル背景と一致 */
+    transform: translateY(-2px); /* 少し浮き上がらせる */
+    box-shadow: 0 4px 8px rgba(199, 125, 199, 0.2);
 }
 
+.store-search-tabs__item a:hover:not(.is-active a) {
+    background-color: #e9ecef;
+    color: #495057;
+    transform: translateY(-1px);
+}
 
-/* フィルターパネル */
+/* --- フィルターパネル --- */
 .store-search-filter-panels {
-    padding: 20px;
-    background-color: #fff; /* パネル背景色 */
-    border: 1px solid #ddd;
-    border-top: none; /* タブのボーダーと連続するように */
-    border-radius: 0 0 8px 8px; /* 下部の角丸 */
-}
-.store-search-filter-panel {
-    display: none; /* JavaScriptでアクティブなものだけ表示 */
-    flex-wrap: wrap; /* ボタンが複数行になる場合 */
-    gap: 10px; /* ボタン間の隙間 */
-}
-.store-search-filter-panel.is-active {
-    display: flex; /* JavaScript側で制御しているので念のため */
+    padding: 25px;
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    min-height: 120px; /* 最小高さを設定 */
 }
 
-/* フィルターボタン共通 (地域・都道府県・その他タクソノミー) */
+.store-search-filter-panel {
+    display: none;
+    flex-wrap: wrap;
+    gap: 12px; /* ボタン間隙間調整 */
+    align-items: flex-start;
+}
+
+.store-search-filter-panel.is-active {
+    display: flex;
+}
+
+/* --- フィルターボタン（Figmaスタイル） --- */
 .filter-button {
-    padding: 8px 15px;
-    border: 1px solid #ced4da;
-    border-radius: 20px; /* 角丸を大きくして楕円風に */
+    padding: 10px 18px; /* パディング調整 */
+    border: 2px solid #e9ecef; /* ボーダー太さ調整 */
+    border-radius: 12px; /* 角丸を小さく（楕円から角丸長方形へ） */
     background-color: #fff;
     color: #495057;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex; /* inputを隠すため */
+    transition: all 0.25s ease;
+    display: inline-flex;
     align-items: center;
-    text-decoration: none; /* buttonタグ以外の場合も考慮 */
+    text-decoration: none;
+    white-space: nowrap; /* テキストの改行防止 */
+    position: relative;
+    overflow: hidden;
 }
-.filter-button input[type="radio"],
-.filter-button input[type="checkbox"] {
-    display: none; /* ラベルのクリックで制御するためinput自体は隠す */
+
+.filter-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(232, 180, 232, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.filter-button:hover::before {
+    left: 100%;
 }
 
 .filter-button:hover {
-    border-color: #adb5bd;
-    background-color: #f8f9fa;
+    border-color: #C77DC7;
+    background-color: #fdf8fd;
+    transform: translateY(-1px);
+    color: #6f42c1;
 }
 
 .filter-button.is-selected {
-    background: linear-gradient(135deg, #DDA0DD, #B05DBA);
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
     color: #fff;
-    border-color: transparent;
+    border-color: #C77DC7;
+    box-shadow: 0 3px 8px rgba(199, 125, 199, 0.3);
+    transform: translateY(-1px);
 }
+
 .filter-button.is-selected:hover {
-    background: linear-gradient(135deg, #cf8ccf, #a04ca9);
+    background: linear-gradient(135deg, #dda3dd, #b86cb8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(199, 125, 199, 0.4);
 }
 
-/* 地方選択ボタン (もし個別にスタイルが必要なら) */
+/* --- 地域選択特殊スタイル --- */
 .filter-button--region {
-    background-color: #f1f3f5; /* 例：地方ボタンだけ少し色を変えるなど */
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-color: #ced4da;
+    font-weight: 600;
 }
 
-/* 都道府県グループ */
+.filter-button--region.is-selected {
+    background: linear-gradient(135deg, #6c5ce7, #5a4fcf);
+    border-color: #5a4fcf;
+}
+
+/* --- 都道府県エリア --- */
 .filter-region__prefectures-wrapper {
     width: 100%;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #f1f3f4;
+    position: relative;
 }
+
+.filter-region__prefectures-wrapper::before {
+    content: '都道府県を選択';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: #fff;
+    padding: 0 10px;
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
 .filter-region__prefecture-group {
-    display: none; /* JSで制御 */
+    display: none;
     flex-wrap: wrap;
     gap: 10px;
+    animation: slideIn 0.3s ease-out;
 }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .filter-region__prefectures-placeholder {
-    color: #6c757d;
+    color: #adb5bd;
     font-size: 14px;
+    text-align: center;
+    padding: 30px;
+    font-style: italic;
 }
 
-
-/* キーワード検索パネル */
+/* --- キーワード検索 --- */
 #filter-keyword {
     width: 100%;
 }
+
 .store-search-filter__keyword-input {
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    font-size: 15px;
+    padding: 16px 20px; /* パディング増加 */
+    border: 2px solid #e9ecef; /* ボーダー太さ統一 */
+    border-radius: 12px; /* 角丸統一 */
+    font-size: 16px; /* フォントサイズ調整 */
     box-sizing: border-box;
+    transition: all 0.3s ease;
+    background: #fafbfc;
 }
+
 .store-search-filter__keyword-input:focus {
-    border-color: #B05DBA;
-    box-shadow: 0 0 0 0.2rem rgba(176, 93, 186, 0.25);
+    border-color: #C77DC7;
+    box-shadow: 0 0 0 3px rgba(199, 125, 199, 0.1);
     outline: none;
+    background: #fff;
 }
 
+.store-search-filter__keyword-input::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
 
-/* 検索実行/リセットボタンエリア */
+/* --- 検索・リセットボタン --- */
 .store-search-form__submit-area {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid #f1f3f4;
     display: flex;
-    justify-content: center; /* ボタンを中央揃え */
-    gap: 15px;
+    justify-content: center;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
 .store-search-form__submit-button,
 .store-search-form__reset-button {
-    padding: 12px 25px;
-    font-size: 15px;
-    font-weight: 500;
-    border-radius: 8px;
+    padding: 14px 32px; /* パディング増加 */
+    font-size: 16px; /* フォントサイズ調整 */
+    font-weight: 600;
+    border-radius: 12px;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
 }
 
 .store-search-form__submit-button {
-    background: linear-gradient(135deg, #DDA0DD, #B05DBA);
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
     color: #fff;
-    box-shadow: 0 2px 5px rgba(176, 93, 186, 0.3);
+    box-shadow: 0 4px 12px rgba(199, 125, 199, 0.3);
+    border-color: #C77DC7;
 }
+
 .store-search-form__submit-button:hover {
-    background: linear-gradient(135deg, #cf8ccf, #a04ca9);
-    box-shadow: 0 3px 7px rgba(176, 93, 186, 0.4);
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #dda3dd, #b86cb8);
+    box-shadow: 0 6px 16px rgba(199, 125, 199, 0.4);
+    transform: translateY(-2px);
 }
 
 .store-search-form__reset-button {
     background-color: #fff;
-    color: #B05DBA; /* 紫系の文字色 */
-    border: 1px solid #B05DBA; /* 紫系の枠線 */
-}
-.store-search-form__reset-button:hover {
-    background-color: #f8f0fa; /* 薄い紫の背景 */
-    border-color: #9947a1;
-    color: #9947a1;
+    color: #6c757d;
+    border-color: #e9ecef;
 }
 
-/* --- 絞り込み条件表示エリア (任意) --- */
-.current-filters-display {
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background-color: #e9ecef;
-    border-radius: 6px;
+.store-search-form__reset-button:hover {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #495057;
+    transform: translateY(-1px);
+}
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 768px) {
+    .store-search-tabs__list {
+        justify-content: center;
+    }
+    
+    .store-search-tabs__item a {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+    
+    .store-search-filter-panels {
+        padding: 20px 15px;
+    }
+    
+/* チェックマーク削除・クリーンボタンスタイル修正版 */
+
+/* --- フィルターボタンの基本スタイル（チェックマーク完全削除版） --- */
+.filter-button {
+    padding: 12px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background-color: #fff;
+    color: #495057;
     font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; /* テキストを中央揃え */
+    text-decoration: none;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    min-height: 44px; /* 最小高さを設定 */
+    box-sizing: border-box;
+}
+
+/* チェックボックス・ラジオボタンを完全に非表示 */
+.filter-button input[type="radio"],
+.filter-button input[type="checkbox"] {
+    display: none !important; /* 強制非表示 */
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ラベル要素のスタイルリセット */
+.filter-button {
+    /* ラベル特有のスタイルをリセット */
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* ブラウザデフォルトのチェックマーク・アイコンを削除 */
+.filter-button::before,
+.filter-button::after {
+    display: none !important;
+}
+
+/* 疑似要素でのチェックマーク削除 */
+.filter-button input:checked::before,
+.filter-button input:checked::after,
+.filter-button input::before,
+.filter-button input::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* ホバーエフェクト */
+.filter-button:hover {
+    border-color: #C77DC7;
+    background-color: #fdf8fd;
+    transform: translateY(-1px);
+    color: #6f42c1;
+}
+
+/* 選択状態（チェックマークなし、グラデーション背景のみ） */
+.filter-button.is-selected {
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
+    color: #fff;
+    border-color: #C77DC7;
+    box-shadow: 0 3px 8px rgba(199, 125, 199, 0.3);
+    transform: translateY(-1px);
+    font-weight: 600; /* 選択時に文字を太く */
+}
+
+.filter-button.is-selected:hover {
+    background: linear-gradient(135deg, #dda3dd, #b86cb8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(199, 125, 199, 0.4);
+}
+
+/* 地域ボタンの特別スタイル */
+.filter-button--region {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-color: #ced4da;
+    font-weight: 600;
     color: #495057;
 }
-.current-filters-display p {
-    margin: 0;
-}
-.current-filters-display .filter-tag {
-    display: inline-block;
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    padding: 3px 8px;
-    border-radius: 15px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    font-size: 13px;
+
+.filter-button--region.is-selected {
+    background: linear-gradient(135deg, #6c5ce7, #5a4fcf);
+    border-color: #5a4fcf;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(106, 92, 231, 0.3);
 }
 
-/* --- 検索結果件数表示 --- */
-.search-results-count {
-    margin-bottom: 20px;
-    font-size: 15px;
-    color: #333;
-    font-weight: 500;
+.filter-button--region:hover:not(.is-selected) {
+    background: linear-gradient(135deg, #e9ecef, #dee2e6);
+    border-color: #adb5bd;
+}
+
+/* ラジオボタン（都道府県）の特別スタイル */
+.filter-button--radio {
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.filter-button--radio.is-selected {
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
+    color: #fff;
+    border-color: #C77DC7;
+}
+
+/* チェックボックス（その他フィルター）の特別スタイル */
+.filter-button--checkbox {
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.filter-button--checkbox.is-selected {
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
+    color: #fff;
+    border-color: #C77DC7;
+}
+
+/* Webkit系ブラウザの追加リセット */
+.filter-button input[type="checkbox"],
+.filter-button input[type="radio"] {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* 念のためのユニバーサルリセット */
+.filter-button *::before,
+.filter-button *::after {
+    content: none !important;
+}
+
+/* フォーカス時のアウトライン調整 */
+.filter-button:focus,
+.filter-button:focus-within {
+    outline: 2px solid #C77DC7;
+    outline-offset: 2px;
+}
+
+/* テキストだけが表示されるようにする */
+.filter-button {
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* アニメーション効果（選択時） */
+.filter-button.is-selected {
+    animation: selectPulse 0.3s ease-out;
+}
+
+@keyframes selectPulse {
+    0% {
+        transform: scale(1) translateY(0);
+    }
+    50% {
+        transform: scale(1.05) translateY(-2px);
+    }
+    100% {
+        transform: scale(1) translateY(-1px);
+    }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .filter-button {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-height: 40px;
+    }
+}
+
+/* ブラウザデフォルトのチェックマーク・アイコンを削除 */
+.filter-button::before,
+.filter-button::after {
+    display: none !important;
+}
+
+/* 疑似要素でのチェックマーク削除 */
+.filter-button input:checked::before,
+.filter-button input:checked::after,
+.filter-button input::before,
+.filter-button input::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* ホバーエフェクト */
+.filter-button:hover {
+    border-color: #C77DC7;
+    background-color: #fdf8fd;
+    transform: translateY(-1px);
+    color: #6f42c1;
+}
+
+/* 選択状態（チェックマークなし、グラデーション背景のみ） */
+.filter-button.is-selected {
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
+    color: #fff;
+    border-color: #C77DC7;
+    box-shadow: 0 3px 8px rgba(199, 125, 199, 0.3);
+    transform: translateY(-1px);
+    font-weight: 600; /* 選択時に文字を太く */
+}
+
+.filter-button.is-selected:hover {
+    background: linear-gradient(135deg, #dda3dd, #b86cb8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(199, 125, 199, 0.4);
+}
+
+/* 地域ボタンの特別スタイル */
+.filter-button--region {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-color: #ced4da;
+    font-weight: 600;
+    color: #495057;
+}
+
+.filter-button--region.is-selected {
+    background: linear-gradient(135deg, #6c5ce7, #5a4fcf);
+    border-color: #5a4fcf;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(106, 92, 231, 0.3);
+}
+
+.filter-button--region:hover:not(.is-selected) {
+    background: linear-gradient(135deg, #e9ecef, #dee2e6);
+    border-color: #adb5bd;
+}
+
+/* ラジオボタン（都道府県）の特別スタイル */
+.filter-button--radio {
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.filter-button--radio.is-selected {
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
+    color: #fff;
+    border-color: #C77DC7;
+}
+
+/* チェックボックス（その他フィルター）の特別スタイル */
+.filter-button--checkbox {
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.filter-button--checkbox.is-selected {
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
+    color: #fff;
+    border-color: #C77DC7;
+}
+
+/* Webkit系ブラウザの追加リセット */
+.filter-button input[type="checkbox"],
+.filter-button input[type="radio"] {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* 念のためのユニバーサルリセット */
+.filter-button *::before,
+.filter-button *::after {
+    content: none !important;
+}
+
+/* フォーカス時のアウトライン調整 */
+.filter-button:focus,
+.filter-button:focus-within {
+    outline: 2px solid #C77DC7;
+    outline-offset: 2px;
+}
+
+/* テキストだけが表示されるようにする */
+.filter-button {
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* アニメーション効果（選択時） */
+.filter-button.is-selected {
+    animation: selectPulse 0.3s ease-out;
+}
+
+    
+    .store-search-form__submit-area {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .store-search-form__submit-button,
+    .store-search-form__reset-button {
+        width: 100%;
+        max-width: 280px;
+    }
 }
 
 /* --- 店舗一覧表示 --- */
