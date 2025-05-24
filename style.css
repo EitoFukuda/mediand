@@ -294,18 +294,22 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: flex-end;
+    text-align: center;
 }
 
 .store-hero__main-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     flex: 1;
 }
 
 .store-hero__name {
     font-size: 36px;
     font-weight: bold;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     line-height: 1.3;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
 }
@@ -318,7 +322,7 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     font-size: 16px;
     display: flex;
     align-items: center;
-    margin-bottom: 0;
+    margin-bottom: 20px;
 }
 
 .store-hero__location-icon {
@@ -1446,7 +1450,7 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
 /* --- 店舗一覧表示 --- */
 .store-list-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 3列表示、最小幅300px */
+    grid-template-columns: repeat(4, 1fr);
     gap: 25px; /* カード間の隙間 */
     margin-bottom: 40px;
 }
@@ -1569,8 +1573,9 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
 
 /* ページネーション */
 .archive-store-main .pagination {
-    margin-top: 40px;
-    text-align: center;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 95%;
 }
 
 .archive-store-main .pagination ul {
@@ -2429,6 +2434,10 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     .medi-situation-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
+
+    .store-list-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -2499,6 +2508,10 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     
     .medi-situation-item {
         height: 180px;
+    }
+
+    .store-list-container {
+        grid-template-columns: 1fr;
     }
 }
 

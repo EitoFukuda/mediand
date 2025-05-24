@@ -1,0 +1,23 @@
+{
+  "name": "gensen_tcd050_child",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EitoFukuda/mediand.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EitoFukuda/mediand/issues"
+  },
+  "homepage": "https://github.com/EitoFukuda/mediand#readme",
+  "description": "",
+  "devDependencies": {
+    "@stagewise/toolbar": "^0.2.1"
+  }
+}

@@ -75,6 +75,40 @@ function medi_gensen_child_enqueue_assets() {
 add_action('wp_enqueue_scripts', 'medi_gensen_child_enqueue_assets');
 
 /**
+ * Enqueue Stagewise Toolbar in development mode.
+ */
+function medi_gensen_child_enqueue_stagewise_toolbar() {
+    // WP_DEBUG を開発モードの判定に使用します。
+    // または、より具体的な開発環境判定 (例: in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1'])) を使用することもできます。
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        // Stagewiseツールバー本体のスクリプトをエンキュー
+        // 重要: PATH_TO_STAGEWISE_TOOLBAR_JS を実際のパスに置き換えてください。
+        // 例: get_stylesheet_directory_uri() . '/node_modules/@stagewise/toolbar/dist/toolbar.umd.js'
+        // パッケージのバージョンやビルド方法によってパスは異なります。
+        wp_enqueue_script(
+            'stagewise-toolbar-main',
+            'PATH_TO_STAGEWISE_TOOLBAR_JS', // ここを修正してください
+            array(), // 依存関係なし
+            null,    // バージョン (パッケージに依存)
+            true     // フッターで読み込み
+        );
+
+        // Stagewise初期化スクリプトをエンキュー
+        wp_enqueue_script(
+            'stagewise-init',
+            get_stylesheet_directory_uri() . '/js/stagewise-init.js',
+            array('stagewise-toolbar-main'), // ツールバー本体の後に読み込む
+            wp_get_theme()->get('Version'),
+            true
+        );
+
+        // Stagewiseツールバーが必要とするCSSがあれば、同様にエンキューします。
+        // 例: wp_enqueue_style('stagewise-toolbar-style', get_stylesheet_directory_uri() . '/node_modules/@stagewise/toolbar/dist/toolbar.css');
+    }
+}
+add_action( 'wp_enqueue_scripts', 'medi_gensen_child_enqueue_stagewise_toolbar', 999 ); // 他のスクリプトより後に実行されるように優先度を調整
+
+/**
  * ナビゲーションメニューの登録
  */
 function medi_gensen_child_register_nav_menus() {
@@ -219,8 +253,6 @@ function medi_custom_image_sizes() {
     add_image_size('store-card', 350, 200, true);
 }
 add_action('after_setup_theme', 'medi_custom_image_sizes');
-
-
 
 /**
  * Ajax フィルター処理
