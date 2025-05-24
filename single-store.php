@@ -82,40 +82,42 @@ $address_for_map = get_field('store_address', $store_id);
 >
     <div class="store-hero__overlay"></div>
     <div class="store-hero__content">
-    <div class="store-hero__main-info">
-        <h1 class="store-hero__name"><?php echo esc_html($store_title); ?></h1>
-        
-        <?php if ($prefecture_display) : ?>
-            <div class="store-hero__location">
-                <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="地域" class="store-hero__location-icon">
-                <span class="store-hero__location-text"><?php echo $prefecture_display; ?></span>
-            </div>
-        <?php endif; ?>
-        
-        <?php
-        // SNSアイコンの表示判定とループ
-        $has_sns_hero = false;
-        ob_start(); // アイコン出力を一旦バッファに保存
-        foreach ($hero_sns_definitions as $sns_item) {
-            if (get_field($sns_item['field'], $store_id)) {
-                $has_sns_hero = true;
-                $url = get_field($sns_item['field'], $store_id);
-                ?>
-                <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer" class="store-hero__social-link" title="<?php echo esc_attr($sns_item['alt']); ?>">
-                    <img src="<?php echo esc_url($icon_base_path . $sns_item['icon']); ?>" alt="<?php echo esc_attr($sns_item['alt']); ?>" class="store-hero__social-icon">
-                </a>
+        <div class="container">
+            <div class="store-hero__main-info">
+                <h1 class="store-hero__name"><?php echo esc_html($store_title); ?></h1>
+                
+                <?php if ($prefecture_display) : ?>
+                    <div class="store-hero__location">
+                        <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="地域" class="store-hero__location-icon">
+                        <span class="store-hero__location-text"><?php echo $prefecture_display; ?></span>
+                    </div>
+                <?php endif; ?>
+                
                 <?php
-            }
-        }
-        $sns_icons_html = ob_get_clean();
+                // SNSアイコンの表示
+                $has_sns = false;
+                ob_start();
+                foreach ($hero_sns_definitions as $sns_item) {
+                    if (get_field($sns_item['field'], $store_id)) {
+                        $has_sns = true;
+                        $url = get_field($sns_item['field'], $store_id);
+                        ?>
+                        <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer" class="store-hero__social-link" title="<?php echo esc_attr($sns_item['alt']); ?>">
+                            <img src="<?php echo esc_url($icon_base_path . $sns_item['icon']); ?>" alt="<?php echo esc_attr($sns_item['alt']); ?>" class="store-hero__social-icon">
+                        </a>
+                        <?php
+                    }
+                }
+                $sns_icons_html = ob_get_clean();
 
-        if ($has_sns_hero) : ?>
-            <div class="store-hero__social">
-                <?php echo $sns_icons_html; // バッファしたアイコンHTMLを出力 ?>
+                if ($has_sns) : ?>
+                    <div class="store-hero__social">
+                        <?php echo $sns_icons_html; ?>
+                    </div>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
+        </div>
     </div>
-</div>
 </div>
 
 <div class="store-content-wrapper">
@@ -214,53 +216,76 @@ $address_for_map = get_field('store_address', $store_id);
             </section>
 
             <?php // --- 基本情報セクション --- ?>
-            <section class="store-basic-info">
-                <h2 class="store-section-title">基本情報</h2>
-                <dl class="store-details-table">
-                    <div class="store-details-row">
-                        <dt class="store-details-term">店舗名</dt>
-                        <dd class="store-details-desc"><?php echo esc_html($store_title); ?></dd>
-                    </div>
-                    <div class="store-details-row">
-                        <dt class="store-details-term">ジャンル</dt>
-                        <dd class="store-details-desc">
-                            <?php
-                            $genre_terms = get_the_terms($store_id, 'genre');
-                            if (!empty($genre_terms) && !is_wp_error($genre_terms)) {
-                                echo esc_html(implode(', ', array_map(function($term) { return $term->name; }, $genre_terms)));
+<section class="store-basic-info">
+    <h2 class="store-section-title">基本情報</h2>
+    <dl class="store-details-table">
+        <div class="store-details-row">
+            <dt class="store-details-term">店舗名</dt>
+            <dd class="store-details-desc"><?php echo esc_html($store_title); ?></dd>
+        </div>
+        
+        <div class="store-details-row">
+            <dt class="store-details-term">ジャンル</dt>
+            <dd class="store-details-desc">
+                <?php
+                $genre_terms = get_the_terms($store_id, 'genre');
+                if (!empty($genre_terms) && !is_wp_error($genre_terms)) {
+                    echo esc_html(implode(', ', array_map(function($term) { return $term->name; }, $genre_terms)));
+                } else {
+                    echo '未設定';
+                }
+                ?>
+            </dd>
+        </div>
+        
+        <?php
+        // 詳細情報用のフィールド定義を拡張
+        $store_detail_fields = array(
+            'store_phone_number'        => 'お問い合わせ',
+            'store_address'             => '住所',
+            'store_access'              => '交通手段',
+            'store_hours'               => '営業時間',
+            'store_holiday'             => '定休日',
+            'store_payment_methods'     => '支払い方法',
+            'store_price_range'         => '価格帯',
+            'store_seat_count'          => '座席数',
+            'store_has_private_room'    => '個室',
+            'store_has_parking'         => '駐車場',
+            'store_special_points'      => 'こだわりポイント',
+            'store_menu_details'        => 'メニュー情報',
+        );
+        
+        foreach ($store_detail_fields as $field_name => $label) :
+            $value = get_field($field_name);
+            if (isset($value) && $value !== '' && !(is_array($value) && empty($value))) :
+        ?>
+                <div class="store-details-row">
+                    <dt class="store-details-term"><?php echo esc_html($label); ?></dt>
+                    <dd class="store-details-desc">
+                        <?php
+                        if (is_array($value)) {
+                            echo esc_html(implode(', ', $value));
+                        } elseif (in_array($field_name, ['store_has_private_room', 'store_has_parking'])) {
+                            // 真偽値フィールドの処理
+                            if ($value === true || in_array(strtolower($value), ['あり', '有り']) || $value === 1 || $value === '1') {
+                                echo '有り';
+                            } elseif ($value === false || in_array(strtolower($value), ['なし', '無し']) || $value === 0 || $value === '0') {
+                                echo '無し';
                             } else {
-                                echo '未設定';
+                                echo nl2br(esc_html($value));
                             }
-                            ?>
-                        </dd>
-                    </div>
-                    <?php foreach ($store_detail_fields as $field_name => $label) : ?>
-                        <?php $value = get_field($field_name); ?>
-                        <?php if (isset($value) && $value !== '' && !(is_array($value) && empty($value))) : ?>
-                            <div class="store-details-row">
-                                <dt class="store-details-term"><?php echo esc_html($label); ?></dt>
-                                <dd class="store-details-desc">
-                                    <?php
-                                    if (is_array($value)) {
-                                        echo esc_html(implode(', ', $value));
-                                    } elseif (in_array($field_name, ['store_has_private_room', 'store_has_parking'])) {
-                                        if ($value === true || in_array(strtolower($value), ['あり', '有り']) || $value === 1 || $value === '1') {
-                                            echo '有り';
-                                        } elseif ($value === false || in_array(strtolower($value), ['なし', '無し']) || $value === 0 || $value === '0') {
-                                            echo '無し';
-                                        } else {
-                                            echo nl2br(esc_html($value));
-                                        }
-                                    } else {
-                                        echo nl2br(esc_html($value));
-                                    }
-                                    ?>
-                                </dd>
-                            </div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </dl>
-            </section>
+                        } else {
+                            echo nl2br(esc_html($value));
+                        }
+                        ?>
+                    </dd>
+                </div>
+        <?php
+            endif;
+        endforeach;
+        ?>
+    </dl>
+</section>
 
             <?php // --- マップセクション --- ?>
             <?php if ($address_for_map) : ?>

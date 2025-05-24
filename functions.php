@@ -498,4 +498,60 @@ function medi_admin_styles() {
     </style>';
 }
 add_action('admin_head', 'medi_admin_styles');
+
+// タクソノミーターム用のACFフィールドグループを作成
+if( function_exists('acf_add_local_field_group') ):
+    acf_add_local_field_group(array(
+        'key' => 'group_feeling_icon',
+        'title' => 'アイコン設定',
+        'fields' => array(
+            array(
+                'key' => 'field_feeling_icon',
+                'label' => 'アイコン画像',
+                'name' => 'feeling_icon',
+                'type' => 'image',
+                'return_format' => 'array',
+                'preview_size' => 'thumbnail',
+            ),
+        ),
+        'location' => array(
+            array(
+                array(
+                    'param' => 'taxonomy',
+                    'operator' => '==',
+                    'value' => 'feeling',
+                ),
+            ),
+        ),
+    ));
+endif;
+
+// シチュエーションタクソノミー用のACFフィールド
+if( function_exists('acf_add_local_field_group') ):
+    acf_add_local_field_group(array(
+        'key' => 'group_situation_image',
+        'title' => '画像設定',
+        'fields' => array(
+            array(
+                'key' => 'field_situation_image',
+                'label' => 'シチュエーション画像',
+                'name' => 'situation_image',
+                'type' => 'image',
+                'return_format' => 'array',
+                'preview_size' => 'medium',
+            ),
+        ),
+        'location' => array(
+            array(
+                array(
+                    'param' => 'taxonomy',
+                    'operator' => '==',
+                    'value' => 'situation',
+                ),
+            ),
+        ),
+    ));
+endif;
 ?>
+
+

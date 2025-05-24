@@ -33,6 +33,44 @@ jQuery(document).ready(function($) {
     }
 
     // =====================================
+// 新着店舗スライダー
+// =====================================
+function initRecommendSlider() {
+    const slider = document.getElementById('recommendSlider');
+    const prevBtn = document.getElementById('recommendPrev');
+    const nextBtn = document.getElementById('recommendNext');
+    
+    if (!slider || !prevBtn || !nextBtn) return;
+    
+    let currentIndex = 0;
+    const slides = slider.querySelectorAll('.medi-recommend-slide');
+    const totalSlides = slides.length;
+    const slidesPerView = 4;
+    const maxIndex = Math.max(0, totalSlides - slidesPerView);
+    
+    function updateSlider() {
+        const translateX = -currentIndex * (100 / slidesPerView);
+        slider.style.transform = `translateX(${translateX}%)`;
+    }
+    
+    prevBtn.addEventListener('click', () => {
+        currentIndex = Math.max(0, currentIndex - 1);
+        updateSlider();
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        currentIndex = Math.min(maxIndex, currentIndex + 1);
+        updateSlider();
+    });
+    
+    // 自動スライド
+    setInterval(() => {
+        currentIndex = (currentIndex + 1) > maxIndex ? 0 : currentIndex + 1;
+        updateSlider();
+    }, 5000);
+}
+
+    // =====================================
     // スクロールアニメーション
     // =====================================
     function initScrollAnimations() {
@@ -183,26 +221,27 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // =====================================
-    // 初期化
-    // =====================================
-    function initialize() {
-        console.log('[medi& Homepage] Initializing...');
+   // =====================================
+// 初期化
+// =====================================
+function initialize() {
+    console.log('[medi& Homepage] Initializing...');
+    
+    try {
+        initRegionAccordion();
+        initScrollAnimations();
+        initHeroSearchForm();
+        initCardEffects();
+        initSmoothScroll();
+        initLazyLoading();
+        initRecommendSlider(); // 新着スライダー追加
+        handleErrors();
         
-        try {
-            initRegionAccordion();
-            initScrollAnimations();
-            initHeroSearchForm();
-            initCardEffects();
-            initSmoothScroll();
-            initLazyLoading();
-            handleErrors();
-            
-            console.log('[medi& Homepage] Initialization completed successfully');
-        } catch (error) {
-            console.error('[medi& Homepage] Initialization failed:', error);
-        }
+        console.log('[medi& Homepage] Initialization completed successfully');
+    } catch (error) {
+        console.error('[medi& Homepage] Initialization failed:', error);
     }
+}
 
     // DOM準備完了後に初期化実行
     if (document.readyState === 'loading') {
