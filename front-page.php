@@ -19,142 +19,161 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
 
 <div class="homepage-wrapper">
     
-    <?php // --- TCDのスライダー/ヒーローセクション表示 --- ?>
-    <?php if (isset($dp_options['show_index_slider']) && $dp_options['show_index_slider']) : ?>
-        <?php get_template_part('template-parts/header-slider'); ?>
-    <?php else : ?>
-        <?php // フォールバック：独自ヒーローセクション ?>
-        <section class="medi-hero-section">
-            <div class="medi-hero-section__bg-shapes">
-                <div class="shape shape-1"></div>
-                <div class="shape shape-2"></div>
-                <div class="shape shape-3"></div>
-            </div>
-            <div class="container">
-                <div class="medi-hero-section__content">
-                    <div class="medi-hero-section__text">
-                        <h1 class="medi-hero-section__title">
-                            <span class="title-sns">SNS</span>
-                            <span class="title-kara">から</span>
-                            <span class="title-real">リアルへ</span>
-                        </h1>
-                        <p class="medi-hero-section__description">
-                            SNSで見つけた素敵なお店を、実際に体験してみませんか？<br>
-                            あなたの気分やシチュエーションに合わせて、最適なお店を見つけましょう。
-                        </p>
-                    </div>
-                    <div class="medi-hero-section__illustration">
-                        <!-- イラスト用のSVGまたは画像 -->
-                        <div class="illustration-placeholder">
-                            <div class="character character-1"></div>
-                            <div class="character character-2"></div>
-                            <div class="floating-elements">
-                                <div class="element element-1"></div>
-                                <div class="element element-2"></div>
-                                <div class="element element-3"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <?php // --- カスタムヒーローセクション --- ?>
+    <section class="medi-hero-section" <?php if(get_field('hero_background_image', 'option')) : ?>style="background-image: url('<?php echo esc_url(get_field('hero_background_image', 'option')); ?>');"<?php endif; ?>>
+        <?php if(get_field('hero_video_url', 'option')) : ?>
+        <video class="medi-hero-video" autoplay muted loop playsinline>
+            <source src="<?php echo esc_url(get_field('hero_video_url', 'option')); ?>" type="video/mp4">
+        </video>
+        <?php endif; ?>
+        
+        <div class="medi-hero-overlay"></div>
+        
+        <div class="container">
+            <div class="medi-hero-content">
+                <h1 class="medi-hero-title">
+                    <span class="title-sns">SNS</span>
+                    <span class="title-kara">から</span>
+                    <span class="title-real">リアルへ</span>
+                </h1>
+                <p class="medi-hero-description">
+                    SNSで見つけた素敵なお店を、実際に体験してみませんか？<br>
+                    あなたの気分やシチュエーションに合わせて、最適なお店を見つけましょう。
+                </p>
                 
-                <div class="medi-hero-section__search">
-                    <form action="<?php echo esc_url(get_post_type_archive_link('store')); ?>" method="get" class="medi-hero-search-form">
-                        <div class="medi-hero-search-form__wrapper">
-                            <input type="search" name="s" placeholder="地域名・お店の名前・特徴・気分・目的など" class="medi-hero-search-form__input">
-                            <button type="submit" class="medi-hero-search-form__button">検索</button>
+                <div class="medi-hero-search">
+                    <form action="<?php echo esc_url(home_url('/')); ?>" method="get" class="medi-hero-search-form">
+                        <input type="hidden" name="post_type" value="store">
+                        
+                        <div class="medi-hero-search-wrapper">
+                            <div class="medi-hero-search-selects">
+                                <?php // 都道府県ドロップダウン ?>
+                                <select name="prefecture" class="medi-hero-select">
+                                    <option value="">都道府県を選択</option>
+                                    <?php
+                                    $prefectures = get_terms(array(
+                                        'taxonomy' => 'prefecture',
+                                        'hide_empty' => false,
+                                        'parent' => !0, // 親タームを除外
+                                        'orderby' => 'name',
+                                        'order' => 'ASC'
+                                    ));
+                                    foreach($prefectures as $pref) :
+                                    ?>
+                                        <option value="<?php echo esc_attr($pref->slug); ?>"><?php echo esc_html($pref->name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                
+                                <?php // ジャンルドロップダウン ?>
+                                <select name="genre" class="medi-hero-select">
+                                    <option value="">ジャンルを選択</option>
+                                    <?php
+                                    $genres = get_terms(array(
+                                        'taxonomy' => 'genre',
+                                        'hide_empty' => false,
+                                        'orderby' => 'name',
+                                        'order' => 'ASC'
+                                    ));
+                                    foreach($genres as $genre) :
+                                    ?>
+                                        <option value="<?php echo esc_attr($genre->slug); ?>"><?php echo esc_html($genre->name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            
+                            <input type="search" name="s" placeholder="キーワードを入力" class="medi-hero-search-input">
+                            <button type="submit" class="medi-hero-search-button">検索</button>
                         </div>
                     </form>
                 </div>
             </div>
-        </section>
-    <?php endif; ?>
+        </div>
+    </section>
 
     <div class="homepage-content-wrapper">
         
-        <?php // --- おすすめセクション --- ?>
+        <?php // --- おすすめセクション（スライダー版） --- ?>
         <section class="medi-recommend-section">
             <div class="container">
-                <h2 class="medi-section-title">おすすめ</h2>
-                <p class="medi-section-subtitle">編集部がセレクトした、今注目のお店をご紹介！</p>
+                <h2 class="medi-section-title">新着店舗</h2>
+                <p class="medi-section-subtitle">最新の登録店舗をご紹介！</p>
                 
-                <div class="medi-recommend-grid">
-                    <?php
-                    // おすすめ店舗の取得（最新4件をフォールバック）
-                    $recommend_query = new WP_Query(array(
-                        'post_type' => 'store',
-                        'posts_per_page' => 4,
-                        'orderby' => 'date',
-                        'order' => 'DESC'
-                    ));
-                    
-                    if ($recommend_query->have_posts()) :
-                        while ($recommend_query->have_posts()) : $recommend_query->the_post();
-                            $store_id = get_the_ID();
-                            $store_title = get_the_title();
-                            $store_permalink = get_permalink();
-                            $store_thumbnail = get_the_post_thumbnail_url($store_id, 'medium');
-                            
-                            // 都道府県取得
-                            $prefecture_terms = get_the_terms($store_id, 'prefecture');
-                            $prefecture_display = '';
-                            if (!empty($prefecture_terms) && !is_wp_error($prefecture_terms)) {
-                                $pref_names = [];
-                                foreach($prefecture_terms as $term) {
-                                    if($term->parent != 0) {
-                                        $pref_names[] = esc_html($term->name);
+                <div class="medi-recommend-slider-wrapper">
+                    <div class="medi-recommend-slider" id="recommendSlider">
+                        <?php
+                        // 新着店舗10件を取得
+                        $recommend_query = new WP_Query(array(
+                            'post_type' => 'store',
+                            'posts_per_page' => 10,
+                            'orderby' => 'date',
+                            'order' => 'DESC'
+                        ));
+                        
+                        if ($recommend_query->have_posts()) :
+                            while ($recommend_query->have_posts()) : $recommend_query->the_post();
+                                $store_id = get_the_ID();
+                                $store_title = get_the_title();
+                                $store_permalink = get_permalink();
+                                $store_thumbnail = get_the_post_thumbnail_url($store_id, 'medium');
+                                
+                                // 都道府県取得
+                                $prefecture_terms = get_the_terms($store_id, 'prefecture');
+                                $prefecture_display = '';
+                                if (!empty($prefecture_terms) && !is_wp_error($prefecture_terms)) {
+                                    $pref_names = [];
+                                    foreach($prefecture_terms as $term) {
+                                        if($term->parent != 0) {
+                                            $pref_names[] = esc_html($term->name);
+                                        }
                                     }
+                                    $prefecture_display = implode(', ', $pref_names);
                                 }
-                                $prefecture_display = implode(', ', $pref_names);
-                            }
-                            
-                            // ジャンル取得
-                            $genre_terms = get_the_terms($store_id, 'genre');
-                            $genre_display = '';
-                            if (!empty($genre_terms) && !is_wp_error($genre_terms)) {
-                                $genre_names = [];
-                                foreach(array_slice($genre_terms, 0, 2) as $term) {
-                                    $genre_names[] = esc_html($term->name);
-                                }
-                                $genre_display = implode(', ', $genre_names);
-                            }
-                    ?>
-                            <article class="medi-recommend-card">
-                                <a href="<?php echo esc_url($store_permalink); ?>" class="medi-recommend-card__link">
-                                    <div class="medi-recommend-card__image">
-                                        <?php if ($store_thumbnail) : ?>
-                                            <img src="<?php echo esc_url($store_thumbnail); ?>" alt="<?php echo esc_attr($store_title); ?>">
-                                        <?php else : ?>
-                                            <div class="medi-recommend-card__no-image">No Image</div>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="medi-recommend-card__content">
-                                        <h3 class="medi-recommend-card__title"><?php echo esc_html($store_title); ?></h3>
-                                        <?php if ($prefecture_display) : ?>
-                                            <p class="medi-recommend-card__location">
-                                                <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="" class="location-icon">
-                                                <?php echo $prefecture_display; ?>
-                                            </p>
-                                        <?php endif; ?>
-                                        <?php if ($genre_display) : ?>
-                                            <div class="medi-recommend-card__tags">
-                                                <?php foreach(array_slice($genre_terms, 0, 2) as $term) : ?>
-                                                    <span class="tag"><?php echo esc_html($term->name); ?></span>
-                                                <?php endforeach; ?>
+                                
+                                // ジャンル取得
+                                $genre_terms = get_the_terms($store_id, 'genre');
+                        ?>
+                                <div class="medi-recommend-slide">
+                                    <article class="medi-recommend-card">
+                                        <a href="<?php echo esc_url($store_permalink); ?>" class="medi-recommend-card__link">
+                                            <div class="medi-recommend-card__image">
+                                                <?php if ($store_thumbnail) : ?>
+                                                    <img src="<?php echo esc_url($store_thumbnail); ?>" alt="<?php echo esc_attr($store_title); ?>">
+                                                <?php else : ?>
+                                                    <div class="medi-recommend-card__no-image">No Image</div>
+                                                <?php endif; ?>
                                             </div>
-                                        <?php endif; ?>
-                                    </div>
-                                </a>
-                            </article>
-                    <?php 
-                        endwhile; 
-                        wp_reset_postdata();
-                    endif;
-                    ?>
+                                            <div class="medi-recommend-card__content">
+                                                <h3 class="medi-recommend-card__title"><?php echo esc_html($store_title); ?></h3>
+                                                <?php if ($prefecture_display) : ?>
+                                                    <p class="medi-recommend-card__location">
+                                                        <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="" class="location-icon">
+                                                        <?php echo $prefecture_display; ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                                <?php if ($genre_terms && !is_wp_error($genre_terms)) : ?>
+                                                    <div class="medi-recommend-card__tags">
+                                                        <?php foreach(array_slice($genre_terms, 0, 2) as $term) : ?>
+                                                            <span class="tag"><?php echo esc_html($term->name); ?></span>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </a>
+                                    </article>
+                                </div>
+                        <?php 
+                            endwhile; 
+                            wp_reset_postdata();
+                        endif;
+                        ?>
+                    </div>
+                    <button class="medi-slider-nav medi-slider-prev" id="recommendPrev">‹</button>
+                    <button class="medi-slider-nav medi-slider-next" id="recommendNext">›</button>
                 </div>
             </div>
         </section>
 
-        <?php // --- 地域から選ぶセクション --- ?>
+        <?php // --- 地域から選ぶセクション（並び順修正） --- ?>
         <section class="medi-region-section">
             <div class="container">
                 <h2 class="medi-section-title">地域から選ぶ</h2>
@@ -162,16 +181,49 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                 
                 <div class="medi-region-accordion">
                     <?php
+                    // 地方の順番を定義
+                    $region_order = array(
+                        '北海道・東北',
+                        '関東',
+                        '中部',
+                        '関西',
+                        '中国・四国',
+                        '九州・沖縄'
+                    );
+                    
                     $region_terms = get_terms(array(
                         'taxonomy' => 'prefecture',
                         'parent' => 0,
-                        'hide_empty' => false,
-                        'orderby' => 'name',
-                        'order' => 'ASC'
+                        'hide_empty' => false
                     ));
                     
-                    if (!empty($region_terms) && !is_wp_error($region_terms)) :
-                        foreach ($region_terms as $region_term) :
+                    // 並び替え処理
+                    $ordered_regions = array();
+                    foreach($region_order as $region_name) {
+                        foreach($region_terms as $term) {
+                            if($term->name === $region_name || strpos($term->name, $region_name) !== false) {
+                                $ordered_regions[] = $term;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // 見つからなかった地方を追加
+                    foreach($region_terms as $term) {
+                        $found = false;
+                        foreach($ordered_regions as $ordered) {
+                            if($ordered->term_id === $term->term_id) {
+                                $found = true;
+                                break;
+                            }
+                        }
+                        if(!$found) {
+                            $ordered_regions[] = $term;
+                        }
+                    }
+                    
+                    if (!empty($ordered_regions)) :
+                        foreach ($ordered_regions as $region_term) :
                     ?>
                             <div class="medi-region-accordion__item">
                                 <button class="medi-region-accordion__header" data-region-id="<?php echo esc_attr($region_term->term_id); ?>">
@@ -207,7 +259,7 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
             </div>
         </section>
 
-        <?php // --- ココロで選ぶセクション --- ?>
+        <?php // --- ココロで選ぶセクション（アイコン対応） --- ?>
         <section class="medi-feeling-section">
             <div class="container">
                 <h2 class="medi-section-title">ココロで選ぶ</h2>
@@ -224,19 +276,16 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                     
                     if (!empty($feeling_terms) && !is_wp_error($feeling_terms)) :
                         foreach ($feeling_terms as $feeling_term) :
+                            // ACFでタクソノミーにカスタムフィールドを追加している場合
+                            $feeling_icon = get_field('feeling_icon', 'feeling_' . $feeling_term->term_id);
                     ?>
                             <a href="<?php echo esc_url(get_post_type_archive_link('store') . '?feeling_filter[]=' . $feeling_term->slug . '&active_tab=feeling'); ?>" class="medi-feeling-item">
                                 <div class="medi-feeling-item__icon">
-                                    <?php
-                                    // カスタムアイコンがある場合は使用、なければデフォルト
-                                    $custom_icon = get_field('feeling_icon', 'feeling_' . $feeling_term->term_id);
-                                    if ($custom_icon) {
-                                        echo '<img src="' . esc_url($custom_icon['url']) . '" alt="' . esc_attr($feeling_term->name) . '">';
-                                    } else {
-                                        // デフォルトアイコンを使用
-                                        echo '<div class="default-feeling-icon">💝</div>';
-                                    }
-                                    ?>
+                                    <?php if ($feeling_icon) : ?>
+                                        <img src="<?php echo esc_url($feeling_icon['url']); ?>" alt="<?php echo esc_attr($feeling_term->name); ?>">
+                                    <?php else : ?>
+                                        <div class="default-feeling-icon">💝</div>
+                                    <?php endif; ?>
                                 </div>
                                 <span class="medi-feeling-item__text"><?php echo esc_html($feeling_term->name); ?></span>
                             </a>
@@ -248,7 +297,7 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
             </div>
         </section>
 
-        <?php // --- シチュエーションで選ぶセクション --- ?>
+        <?php // --- シチュエーションで選ぶセクション（項目名表示・画像カスタマイズ対応） --- ?>
         <section class="medi-situation-section">
             <div class="container">
                 <h2 class="medi-section-title">シチュエーションで選ぶ</h2>
@@ -264,21 +313,20 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                     ));
                     
                     if (!empty($situation_terms) && !is_wp_error($situation_terms)) :
-                        foreach (array_slice($situation_terms, 0, 6) as $situation_term) :
+                        foreach ($situation_terms as $situation_term) :
+                            // ACFでタクソノミーにカスタムフィールドを追加している場合
+                            $situation_image = get_field('situation_image', 'situation_' . $situation_term->term_id);
                     ?>
                             <a href="<?php echo esc_url(get_post_type_archive_link('store') . '?situation_filter[]=' . $situation_term->slug . '&active_tab=situation'); ?>" class="medi-situation-item">
                                 <div class="medi-situation-item__image">
-                                    <?php
-                                    $custom_image = get_field('situation_image', 'situation_' . $situation_term->term_id);
-                                    if ($custom_image) {
-                                        echo '<img src="' . esc_url($custom_image['url']) . '" alt="' . esc_attr($situation_term->name) . '">';
-                                    } else {
-                                        echo '<div class="default-situation-bg"></div>';
-                                    }
-                                    ?>
-                                    <div class="medi-situation-item__overlay">
-                                        <span class="medi-situation-item__text"><?php echo esc_html($situation_term->name); ?></span>
-                                    </div>
+                                    <?php if ($situation_image) : ?>
+                                        <img src="<?php echo esc_url($situation_image['url']); ?>" alt="<?php echo esc_attr($situation_term->name); ?>">
+                                    <?php else : ?>
+                                        <div class="default-situation-bg"></div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="medi-situation-item__overlay">
+                                    <span class="medi-situation-item__text"><?php echo esc_html($situation_term->name); ?></span>
                                 </div>
                             </a>
                     <?php 
@@ -308,7 +356,7 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                         foreach ($genre_terms as $genre_term) :
                     ?>
                             <a href="<?php echo esc_url(get_post_type_archive_link('store') . '?genre_filter[]=' . $genre_term->slug . '&active_tab=genre'); ?>" class="medi-genre-item">
-                                <?php echo esc_html($genre_term->name); ?>
+                                <span><?php echo esc_html($genre_term->name); ?></span>
                             </a>
                     <?php 
                         endforeach;
