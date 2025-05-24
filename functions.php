@@ -26,6 +26,24 @@ function medi_gensen_child_enqueue_assets() {
     // jQueryを確実に読み込む
     wp_enqueue_script('jquery');
 
+    // トップページでのJavaScript読み込み
+    if (is_front_page() || is_home()) {
+        wp_enqueue_script(
+            'medi-homepage-js',
+            get_stylesheet_directory_uri() . '/js/homepage.js',
+            array('jquery'),
+            wp_get_theme()->get('Version'),
+            true
+        );
+        
+        // ローカライゼーション（必要に応じて）
+        wp_localize_script('medi-homepage-js', 'mediHomepage', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('medi_homepage_nonce'),
+            'store_archive_url' => get_post_type_archive_link('store')
+        ));
+    }
+
     // 店舗一覧ページでのみJavaScriptを読み込み
     if (is_post_type_archive('store')) {
         wp_enqueue_script(
@@ -201,6 +219,7 @@ function medi_custom_image_sizes() {
     add_image_size('store-card', 350, 200, true);
 }
 add_action('after_setup_theme', 'medi_custom_image_sizes');
+
 
 
 /**
@@ -406,3 +425,45 @@ if (WP_DEBUG) {
     }
     add_action('wp_footer', 'medi_debug_info');
 }
+
+/**
+ * TCDテーマオプションとの統合支援
+ */
+function medi_tcd_integration_support() {
+    // TCDのテーマオプションが利用可能な場合の処理
+    global $dp_options;
+    if ($dp_options) {
+        // 必要に応じてTCDオプションを子テーマでカスタマイズ
+        add_filter('tcd_slider_options', 'medi_customize_tcd_slider');
+        add_filter('tcd_header_options', 'medi_customize_tcd_header');
+    }
+}
+add_action('init', 'medi_tcd_integration_support');
+
+/**
+ * TCDスライダーのカスタマイズ
+ */
+function medi_customize_tcd_slider($options) {
+    // 必要に応じてスライダーオプションをカスタマイズ
+    return $options;
+}
+
+/**
+ * TCDヘッダーのカスタマイズ
+ */
+function medi_customize_tcd_header($options) {
+    // 必要に応じてヘッダーオプションをカスタマイズ
+    return $options;
+}
+
+/**
+ * 管理画面でのスタイル調整
+ */
+function medi_admin_styles() {
+    echo '<style>
+        .acf-field-group-title { color: #C77DC7; }
+        .toplevel_page_medi-site-settings .wp-menu-image:before { color: #C77DC7 !important; }
+    </style>';
+}
+add_action('admin_head', 'medi_admin_styles');
+?>
