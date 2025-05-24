@@ -5,186 +5,328 @@
  * @package medi& GENSEN Child
  */
 
-/**
- * Enqueue scripts and styles.
- */
+// 親テーマとの依存関係を明確にし、エラーハンドリングを強化
 function medi_gensen_child_enqueue_assets() {
-    // 親テーマのstyle.cssを読み込みます
+    // 親テーマのstyle.cssを読み込み
     wp_enqueue_style(
-        'gensen_tcd050-parent-style', // ハンドル名
-        get_template_directory_uri() . '/style.css' // 親テーマのstyle.cssのパス
+        'gensen_tcd050-parent-style',
+        get_template_directory_uri() . '/style.css',
+        array(),
+        wp_get_theme(get_template())->get('Version')
     );
 
-    // 子テーマのstyle.cssを読み込みます
+    // 子テーマのstyle.cssを読み込み
     wp_enqueue_style(
-        'gensen_tcd050-child-style', // ハンドル名
-        get_stylesheet_directory_uri() . '/style.css', // 子テーマのstyle.cssのパス
-        array( 'gensen_tcd050-parent-style' ), // 依存関係: 親テーマのスタイルより後に読み込む
-        wp_get_theme()->get('Version') // 子テーマのバージョン (style.cssで定義)
+        'gensen_tcd050-child-style',
+        get_stylesheet_directory_uri() . '/style.css',
+        array('gensen_tcd050-parent-style'),
+        wp_get_theme()->get('Version')
     );
 
-    // WordPressコアのjQueryを確実に読み込む (通常は依存関係で自動だが念のため)
+    // jQueryを確実に読み込む
     wp_enqueue_script('jquery');
 
-    // カスタムJavaScriptファイルの読み込み (archive-store.phpのタブUIとフィルター用)
-    // is_post_type_archive('store') で、店舗一覧ページでのみ読み込むように条件分岐
-    if ( is_post_type_archive('store') ) {
+    // 店舗一覧ページでのみJavaScriptを読み込み
+    if (is_post_type_archive('store')) {
         wp_enqueue_script(
-            'archive-store-filters', // スクリプトのハンドル名
-            get_stylesheet_directory_uri() . '/js/archive-store-filters.js', // JSファイルのパス
-            array('jquery'), // jQueryに依存する
-            wp_get_theme()->get('Version'), // バージョン番号
-            true // true にすると </body> の直前に読み込まれる (推奨)
+            'archive-store-filters',
+            get_stylesheet_directory_uri() . '/js/archive-store-filters.js',
+            array('jquery'),
+            wp_get_theme()->get('Version'),
+            true
+        );
+        
+        // Ajax用のローカライゼーション
+        wp_localize_script('archive-store-filters', 'store_ajax', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('store_filter_nonce')
+        ));
+    }
+
+    // 店舗詳細ページでのJavaScript
+    if (is_singular('store')) {
+        wp_enqueue_script(
+            'single-store-js',
+            get_stylesheet_directory_uri() . '/js/single-store.js',
+            array('jquery'),
+            wp_get_theme()->get('Version'),
+            true
         );
     }
 }
-// この関数を 'wp_enqueue_scripts' アクションフックに登録
-add_action( 'wp_enqueue_scripts', 'medi_gensen_child_enqueue_assets' );
-
+add_action('wp_enqueue_scripts', 'medi_gensen_child_enqueue_assets');
 
 /**
- * Register navigation menus.
+ * ナビゲーションメニューの登録
  */
 function medi_gensen_child_register_nav_menus() {
-    register_nav_menus( array(
-        'primary' => esc_html__( 'Primary Navigation', 'gensen_tcd050-child' ),
-        // フッター用のメニュー位置 (footer.php の実装に合わせて調整)
-        'footer_category_menu'  => esc_html__( 'Footer Category Menu', 'gensen_tcd050-child' ),
-        'footer_sitemap_menu'   => esc_html__( 'Footer Sitemap Menu', 'gensen_tcd050-child' ),
-        'footer_support_menu'   => esc_html__( 'Footer Support Menu', 'gensen_tcd050-child' ),
-    ) );
+    register_nav_menus(array(
+        'primary' => esc_html__('Primary Navigation', 'gensen_tcd050-child'),
+        'footer_category_menu' => esc_html__('Footer Category Menu', 'gensen_tcd050-child'),
+        'footer_sitemap_menu' => esc_html__('Footer Sitemap Menu', 'gensen_tcd050-child'),
+        'footer_support_menu' => esc_html__('Footer Support Menu', 'gensen_tcd050-child'),
+    ));
 }
-add_action( 'after_setup_theme', 'medi_gensen_child_register_nav_menus' );
-
+add_action('after_setup_theme', 'medi_gensen_child_register_nav_menus');
 
 /**
- * サイト内検索のクエリをカスタマイズする
- * - GENSENテーマのカスタム検索フォームからのキーワードおよびタクソノミー絞り込みに対応
- * - WordPress標準の検索ウィジェットなどからの検索も考慮
- *
- * @param WP_Query $query WordPress のクエリオブジェクト.
+ * テーマサポートの追加
  */
-function medi_gensen_child_customize_search_query( $query ) {
-    // 管理画面の検索や、メインクエリでない場合は何もしない
-    if ( is_admin() || ! $query->is_main_query() ) {
+function medi_gensen_child_theme_support() {
+    // 投稿サムネイルサポート
+    add_theme_support('post-thumbnails');
+    
+    // カスタムロゴサポート
+    add_theme_support('custom-logo', array(
+        'height' => 100,
+        'width' => 400,
+        'flex-height' => true,
+        'flex-width' => true,
+    ));
+    
+    // HTMLサポート
+    add_theme_support('html5', array(
+        'search-form',
+        'comment-form',
+        'comment-list',
+        'gallery',
+        'caption',
+    ));
+}
+add_action('after_setup_theme', 'medi_gensen_child_theme_support');
+
+/**
+ * 検索クエリのカスタマイズ（エラーハンドリング強化版）
+ */
+function medi_gensen_child_customize_search_query($query) {
+    if (is_admin() || !$query->is_main_query()) {
         return;
     }
 
-    // 検索結果ページの場合のみ処理
-    if ( $query->is_search() ) {
-
-        // --- 検索対象投稿タイプの設定 ---
-        // GENSENのカスタム検索フォーム (子テーマで編集したもの) からは
-        // <input type="hidden" name="post_type" value="store"> が送信される想定。
-        // これにより、GENSENのフォーム経由では 'store' のみが検索対象になる。
-
-        // もし、WordPress標準の検索ウィジェットなど、post_type を指定しない検索も考慮し、
-        // その場合に 'store' を含めたい場合は、ここで調整する。
-        // ただし、GENSENのフォームで post_type=store が明示的に指定されていれば、
-        // ここで他の投稿タイプを追加すると、GENSENフォームの意図と異なる結果になる可能性あり。
-        // 一旦、フォームからの post_type 指定を尊重する形とし、
-        // $query->get('post_type') が空の場合のみデフォルトを設定する。
-
+    if ($query->is_search()) {
+        // 検索対象投稿タイプの設定
         $current_post_types = $query->get('post_type');
-        if ( empty($current_post_types) ) {
-            // フォームから post_type の指定がない場合 (例: 標準検索ウィジェット)
-            // ここで検索対象にしたい投稿タイプを指定する
-            $query->set('post_type', array('store', 'post', 'page')); // 例: 店舗、投稿、固定ページを検索
-        }
-        // GENSENのフォームから 'store' が指定されていれば、上記のifは通らないので、'store' のみが対象になる。
-
-
-        // --- タクソノミーフィルターの処理 (GENSENの検索フォーム用) ---
-        // GENSENの検索フォーム (custom_search_form.php を子テーマで編集したもの) から
-        // name="prefecture" や name="genre" で選択されたタームのスラッグが送信される想定。
-
-        $tax_query_conditions = $query->get('tax_query'); // 既存のtax_queryを取得
-        if ( !is_array($tax_query_conditions) ) {
-            $tax_query_conditions = array();
-        }
-        // 複数のタクソノミー条件はANDで結ぶ
-        if (empty($tax_query_conditions['relation'])) {
-            $tax_query_conditions['relation'] = 'AND';
+        if (empty($current_post_types)) {
+            $query->set('post_type', array('store', 'post', 'page'));
         }
 
-        // 都道府県プルダウンの値 (フォームの name="prefecture" を想定)
-        if ( !empty($_GET['prefecture']) ) {
-            $tax_query_conditions[] = array(
-                'taxonomy' => 'prefecture', // 都道府県タクソノミーのスラッグ
-                'field'    => 'slug',
-                'terms'    => sanitize_text_field($_GET['prefecture']),
-            );
+        // タクソノミーフィルターの処理
+        $tax_query_conditions = $query->get('tax_query');
+        if (!is_array($tax_query_conditions)) {
+            $tax_query_conditions = array('relation' => 'AND');
         }
 
-        // ジャンルプルダウンの値 (フォームの name="genre" を想定)
-        if ( !empty($_GET['genre']) ) {
-            $tax_query_conditions[] = array(
-                'taxonomy' => 'genre', // ジャンルタクソノミーのスラッグ
-                'field'    => 'slug',
-                'terms'    => sanitize_text_field($_GET['genre']),
-            );
+        // 各タクソノミーフィルターの処理
+        $taxonomies = array(
+            'prefecture' => 'prefecture',
+            'genre' => 'genre',
+            'feeling_filter' => 'feeling',
+            'situation_filter' => 'situation',
+            'genre_filter' => 'genre'
+        );
+
+        foreach ($taxonomies as $param => $taxonomy) {
+            if (!empty($_GET[$param])) {
+                $terms = $_GET[$param];
+                
+                // 配列の場合と文字列の場合を処理
+                if (is_array($terms)) {
+                    $terms = array_map('sanitize_text_field', $terms);
+                    $operator = 'AND';
+                } else {
+                    $terms = sanitize_text_field($terms);
+                    $operator = 'IN';
+                }
+
+                // 既に同じタクソノミーの条件がある場合はスキップ
+                $has_taxonomy = false;
+                foreach ($tax_query_conditions as $condition) {
+                    if (isset($condition['taxonomy']) && $condition['taxonomy'] === $taxonomy) {
+                        $has_taxonomy = true;
+                        break;
+                    }
+                }
+
+                if (!$has_taxonomy && !empty($terms)) {
+                    $tax_query_conditions[] = array(
+                        'taxonomy' => $taxonomy,
+                        'field' => 'slug',
+                        'terms' => $terms,
+                        'operator' => $operator,
+                    );
+                }
+            }
         }
 
-        // --- archive-store.php のタブUIからのフィルターも考慮する場合 ---
-        // (これらのパラメータは archive-store.php のフォームから送信される)
-        if ( !empty($_GET['feeling_filter']) && is_array($_GET['feeling_filter']) ) {
-             $tax_query_conditions[] = array(
-                'taxonomy' => 'feeling',
-                'field'    => 'slug',
-                'terms'    => array_map('sanitize_text_field', $_GET['feeling_filter']),
-                'operator' => 'AND', // feeling タブ内で選択されたものはAND条件
-            );
-        }
-        if ( !empty($_GET['situation_filter']) && is_array($_GET['situation_filter']) ) {
-             $tax_query_conditions[] = array(
-                'taxonomy' => 'situation',
-                'field'    => 'slug',
-                'terms'    => array_map('sanitize_text_field', $_GET['situation_filter']),
-                'operator' => 'AND',
-            );
-        }
-        // ジャンルは GENSENフォームと archive-store.php のタブの両方から来る可能性があるので注意
-        // GENSENフォームの name="genre" と archive-store.php の name="genre_filter[]" が衝突しないように
-        // あるいは、どちらか一方のフォームのみを使用するように設計を統一する。
-        // ここでは、archive-store.php からの genre_filter[] も受け取れるようにしておく。
-        if ( !empty($_GET['genre_filter']) && is_array($_GET['genre_filter']) && empty($_GET['genre']) ) { // GENSENフォームのgenreが空の場合のみ
-             $tax_query_conditions[] = array(
-                'taxonomy' => 'genre',
-                'field'    => 'slug',
-                'terms'    => array_map('sanitize_text_field', $_GET['genre_filter']),
-                'operator' => 'AND',
-            );
-        }
-
-
-        // tax_queryに実際に条件が追加された場合のみセットする
-        if (count($tax_query_conditions) > 1 || (isset($tax_query_conditions[0]) && !empty($tax_query_conditions[0]))) {
-            $query->set( 'tax_query', $tax_query_conditions );
+        // tax_queryを設定
+        if (count($tax_query_conditions) > 1) {
+            $query->set('tax_query', $tax_query_conditions);
         }
     }
 }
-// 親テーマの sort_pre_get_posts との実行順を考慮し、優先度を調整 (11より大きくても良い)
-add_action( 'pre_get_posts', 'medi_gensen_child_customize_search_query', 15 );
-
-// functions.phpに以下を追加
-
-
+add_action('pre_get_posts', 'medi_gensen_child_customize_search_query', 15);
 
 /**
  * カスタムサイドバーの登録
  */
 function medi_register_sidebars() {
     register_sidebar(array(
-        'name'          => 'トップページサイドバー',
-        'id'            => 'homepage-sidebar',
-        'description'   => 'トップページの右側に表示されるウィジェットエリア',
+        'name' => 'トップページサイドバー',
+        'id' => 'homepage-sidebar',
+        'description' => 'トップページの右側に表示されるウィジェットエリア',
         'before_widget' => '<div id="%1$s" class="sidebar-widget %2$s">',
-        'after_widget'  => '</div>',
-        'before_title'  => '<h3 class="sidebar-widget-title">',
-        'after_title'   => '</h3>',
+        'after_widget' => '</div>',
+        'before_title' => '<h3 class="sidebar-widget-title">',
+        'after_title' => '</h3>',
+    ));
+
+    register_sidebar(array(
+        'name' => '店舗詳細サイドバー',
+        'id' => 'store-detail-sidebar',
+        'description' => '店舗詳細ページのサイドバー',
+        'before_widget' => '<div id="%1$s" class="sidebar-widget %2$s">',
+        'after_widget' => '</div>',
+        'before_title' => '<h3 class="sidebar-widget-title">',
+        'after_title' => '</h3>',
     ));
 }
 add_action('widgets_init', 'medi_register_sidebars');
+
+/**
+ * カスタム画像サイズの追加
+ */
+function medi_custom_image_sizes() {
+    add_image_size('store-thumbnail', 400, 300, true);
+    add_image_size('store-hero', 1200, 600, true);
+    add_image_size('store-card', 350, 200, true);
+}
+add_action('after_setup_theme', 'medi_custom_image_sizes');
+
+
+/**
+ * Ajax フィルター処理
+ */
+function medi_ajax_store_filter() {
+    // Nonceチェック
+    if (!wp_verify_nonce($_POST['nonce'], 'store_filter_nonce')) {
+        wp_die('Security check failed');
+    }
+
+    $args = array(
+        'post_type' => 'store',
+        'posts_per_page' => 9,
+        'paged' => isset($_POST['page']) ? intval($_POST['page']) : 1,
+    );
+
+    // フィルター条件の処理
+    if (!empty($_POST['filters'])) {
+        $filters = $_POST['filters'];
+        $tax_query = array('relation' => 'AND');
+
+        foreach ($filters as $taxonomy => $terms) {
+            if (!empty($terms)) {
+                $tax_query[] = array(
+                    'taxonomy' => sanitize_text_field($taxonomy),
+                    'field' => 'slug',
+                    'terms' => array_map('sanitize_text_field', $terms),
+                    'operator' => 'IN',
+                );
+            }
+        }
+
+        if (count($tax_query) > 1) {
+            $args['tax_query'] = $tax_query;
+        }
+    }
+
+    $query = new WP_Query($args);
+    
+    ob_start();
+    
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            // 店舗カードのテンプレートパーツを読み込み
+            get_template_part('template-parts/store-card');
+        }
+        wp_reset_postdata();
+    } else {
+        echo '<p class="no-stores-found">条件に合う店舗が見つかりませんでした。</p>';
+    }
+    
+    $html = ob_get_clean();
+    
+    wp_send_json_success(array(
+        'html' => $html,
+        'found_posts' => $query->found_posts,
+        'max_pages' => $query->max_num_pages,
+    ));
+}
+add_action('wp_ajax_store_filter', 'medi_ajax_store_filter');
+add_action('wp_ajax_nopriv_store_filter', 'medi_ajax_store_filter');
+
+/**
+ * SNSシェアボタンのショートコード
+ */
+function medi_social_share_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'title' => get_the_title(),
+        'url' => get_permalink(),
+    ), $atts);
+
+    $title = urlencode($atts['title']);
+    $url = urlencode($atts['url']);
+
+    ob_start();
+    ?>
+    <div class="social-share-buttons">
+        <a href="https://twitter.com/intent/tweet?text=<?php echo $title; ?>&url=<?php echo $url; ?>" target="_blank" class="share-button twitter">
+            <span>Twitter</span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo $url; ?>" target="_blank" class="share-button facebook">
+            <span>Facebook</span>
+        </a>
+        <a href="https://line.me/R/msg/text/?<?php echo $title; ?>%20<?php echo $url; ?>" target="_blank" class="share-button line">
+            <span>LINE</span>
+        </a>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('social_share', 'medi_social_share_shortcode');
+
+/**
+ * パンくずリスト
+ */
+function medi_breadcrumb() {
+    if (is_home() || is_front_page()) {
+        return;
+    }
+
+    echo '<nav class="breadcrumb" aria-label="breadcrumb">';
+    echo '<ol class="breadcrumb-list">';
+    echo '<li class="breadcrumb-item"><a href="' . home_url() . '">ホーム</a></li>';
+
+    if (is_post_type_archive('store')) {
+        echo '<li class="breadcrumb-item active" aria-current="page">店舗一覧</li>';
+    } elseif (is_singular('store')) {
+        echo '<li class="breadcrumb-item"><a href="' . get_post_type_archive_link('store') . '">店舗一覧</a></li>';
+        echo '<li class="breadcrumb-item active" aria-current="page">' . get_the_title() . '</li>';
+    } elseif (is_category()) {
+        echo '<li class="breadcrumb-item active" aria-current="page">' . single_cat_title('', false) . '</li>';
+    } elseif (is_single()) {
+        $category = get_the_category();
+        if (!empty($category)) {
+            echo '<li class="breadcrumb-item"><a href="' . get_category_link($category[0]->term_id) . '">' . $category[0]->name . '</a></li>';
+        }
+        echo '<li class="breadcrumb-item active" aria-current="page">' . get_the_title() . '</li>';
+    } elseif (is_page()) {
+        echo '<li class="breadcrumb-item active" aria-current="page">' . get_the_title() . '</li>';
+    }
+
+    echo '</ol>';
+    echo '</nav>';
+}
 
 /**
  * カスタム広告ウィジェット
@@ -240,6 +382,27 @@ function medi_register_widgets() {
     register_widget('Medi_Ad_Widget');
 }
 add_action('widgets_init', 'medi_register_widgets');
-// これ以降に他のPHPコードを記述する場合は、この下に追記します。
-?>
 
+/**
+ * セキュリティヘッダーの追加
+ */
+function medi_security_headers() {
+    if (!is_admin()) {
+        header('X-Content-Type-Options: nosniff');
+        header('X-Frame-Options: SAMEORIGIN');
+        header('X-XSS-Protection: 1; mode=block');
+    }
+}
+add_action('wp_loaded', 'medi_security_headers');
+
+/**
+ * デバッグ情報の追加（開発環境のみ）
+ */
+if (WP_DEBUG) {
+    function medi_debug_info() {
+        if (current_user_can('administrator')) {
+            echo '<!-- Debug: Theme loaded successfully -->';
+        }
+    }
+    add_action('wp_footer', 'medi_debug_info');
+}
