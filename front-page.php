@@ -26,44 +26,45 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
     global $dp_options;
     if (!$dp_options) $dp_options = get_desing_plus_option();
     
-    // ヘッダーコンテンツタイプを確認
-    $header_content_type = isset($dp_options['header_content_type']) ? $dp_options['header_content_type'] : 'type1';
+    // デバッグ用（確認後削除）
+    // echo '<!-- Debug: Header Type = ' . $dp_options['header_content_type'] . ' -->';
     
-    // 動画の場合
-    if ($header_content_type === 'type2' && isset($dp_options['header_video']) && $dp_options['header_video']) : ?>
-        <video class="medi-hero-video" autoplay muted loop playsinline>
-            <source src="<?php echo esc_url(wp_get_attachment_url($dp_options['header_video'])); ?>" type="video/mp4">
-        </video>
-    <?php 
-    // 画像スライダーの場合
-    elseif ($header_content_type === 'type1' && isset($dp_options['slider_image'])) : ?>
-        <div class="medi-hero-slider">
-            <?php 
-            for ($i = 1; $i <= 5; $i++) {
-                if (!empty($dp_options['slider_image' . $i])) {
-                    $image_url = wp_get_attachment_url($dp_options['slider_image' . $i]);
-                    if ($image_url) {
-                        echo '<div class="medi-hero-slide" style="background-image: url(' . esc_url($image_url) . ');"></div>';
+    // ヘッダーコンテンツタイプを確認
+    if (isset($dp_options['header_content_type'])) {
+        
+        // 動画の場合
+        if ($dp_options['header_content_type'] === 'type3' && !empty($dp_options['header_bg_video'])) : ?>
+            <video class="medi-hero-video" autoplay muted loop playsinline>
+                <source src="<?php echo esc_url(wp_get_attachment_url($dp_options['header_bg_video'])); ?>" type="video/mp4">
+            </video>
+        <?php 
+        // 静止画スライダーの場合
+        elseif ($dp_options['header_content_type'] === 'type2') : ?>
+            <div class="medi-hero-slider">
+                <?php 
+                for ($i = 1; $i <= 5; $i++) {
+                    if (!empty($dp_options['slider_image' . $i])) {
+                        $image_url = wp_get_attachment_url($dp_options['slider_image' . $i]);
+                        if ($image_url) {
+                            echo '<div class="medi-hero-slide" style="background-image: url(' . esc_url($image_url) . ');"></div>';
+                        }
                     }
                 }
-            }
-            ?>
-        </div>
-    <?php endif; ?>
+                ?>
+            </div>
+        <?php 
+        // 単一画像の場合
+        elseif (!empty($dp_options['header_bg_image'])) : ?>
+            <div class="medi-hero-image" style="background-image: url('<?php echo esc_url(wp_get_attachment_url($dp_options['header_bg_image'])); ?>');"></div>
+        <?php endif;
+    }
+    ?>
     
     <div class="medi-hero-overlay"></div>
     
     <div class="container">
         <div class="medi-hero-content">
-            <h1 class="medi-hero-title">
-                <span class="title-sns">SNS</span>
-                <span class="title-kara">から</span>
-                <span class="title-real">リアルへ</span>
-            </h1>
-            <p class="medi-hero-description">
-                SNSで見つけた素敵なお店を、実際に体験してみませんか？<br>
-                あなたの気分やシチュエーションに合わせて、最適なお店を見つけましょう。
-            </p>
+            <!-- テキストは画像に含まれているため削除 -->
             
             <div class="medi-hero-search">
                 <form action="<?php echo esc_url(get_post_type_archive_link('store')); ?>" method="get" class="medi-hero-search-form">
@@ -133,13 +134,58 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                 
                 if ($recommend_query->have_posts()) :
                     while ($recommend_query->have_posts()) : $recommend_query->the_post();
-                        // カードのコードは既存のものを使用
-                        ?>
+                        $store_id = get_the_ID();
+                        $store_title = get_the_title();
+                        $store_permalink = get_permalink();
+                        $store_thumbnail = get_the_post_thumbnail_url($store_id, 'medium');
+                        
+                        // 都道府県取得
+                        $prefecture_terms = get_the_terms($store_id, 'prefecture');
+                        $prefecture_display = '';
+                        if (!empty($prefecture_terms) && !is_wp_error($prefecture_terms)) {
+                            $pref_names = [];
+                            foreach($prefecture_terms as $term) {
+                                if($term->parent != 0) {
+                                    $pref_names[] = esc_html($term->name);
+                                }
+                            }
+                            $prefecture_display = implode(', ', $pref_names);
+                        }
+                        
+                        // ジャンル取得
+                        $genre_terms = get_the_terms($store_id, 'genre');
+                ?>
                         <div class="medi-recommend-slide">
-                            <!-- 既存のカードコード -->
+                            <article class="medi-recommend-card">
+                                <a href="<?php echo esc_url($store_permalink); ?>" class="medi-recommend-card__link">
+                                    <div class="medi-recommend-card__image">
+                                        <?php if ($store_thumbnail) : ?>
+                                            <img src="<?php echo esc_url($store_thumbnail); ?>" alt="<?php echo esc_attr($store_title); ?>">
+                                        <?php else : ?>
+                                            <div class="medi-recommend-card__no-image">No Image</div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="medi-recommend-card__content">
+                                        <h3 class="medi-recommend-card__title"><?php echo esc_html($store_title); ?></h3>
+                                        <?php if ($prefecture_display) : ?>
+                                            <p class="medi-recommend-card__location">
+                                                <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="" class="location-icon">
+                                                <?php echo $prefecture_display; ?>
+                                            </p>
+                                        <?php endif; ?>
+                                        <?php if ($genre_terms && !is_wp_error($genre_terms)) : ?>
+                                            <div class="medi-recommend-card__tags">
+                                                <?php foreach(array_slice($genre_terms, 0, 2) as $term) : ?>
+                                                    <span class="tag"><?php echo esc_html($term->name); ?></span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </a>
+                            </article>
                         </div>
-                        <?php
-                    endwhile;
+                <?php 
+                    endwhile; 
                     wp_reset_postdata();
                 endif;
                 ?>
@@ -160,12 +206,14 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
             <?php
             // 地方の順番を定義
             $region_order = array(
-                '北海道・東北',
+                '北海道/東北',
                 '関東',
                 '中部',
-                '関西',
-                '中国・四国',
-                '九州・沖縄'
+                '近畿', // WordPressに「近畿」または「関西」というタームがあれば
+                '中国',
+                '四国',
+                '九州',
+                '沖縄'  // WordPressに「沖縄」というタームがあれば（通常は九州に含まれるか、都道府県では沖縄県）
             );
             
             $region_terms = get_terms(array(
@@ -247,45 +295,76 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
     </div>
 </section>
 
-<?php // --- シチュエーションで選ぶセクション（項目名表示・画像カスタマイズ対応） --- ?>
-<section class="medi-situation-section">
-    <div class="container">
-        <h2 class="medi-section-title">シチュエーションで選ぶ</h2>
-        <p class="medi-section-subtitle">大切な人との時間や、特別な日にぴったりのお店を見つけましょう。</p>
+<div class="homepage-content-with-sidebar">
+    <div class="homepage-main-content">
         
-        <div class="medi-situation-grid">
-            <?php
-            $situation_terms = get_terms(array(
-                'taxonomy' => 'situation',
-                'hide_empty' => false,
-                'orderby' => 'name',
-                'order' => 'ASC'
-            ));
-            
-            if (!empty($situation_terms) && !is_wp_error($situation_terms)) :
-                foreach ($situation_terms as $situation_term) :
-                    // ACFでタクソノミーにカスタムフィールドを追加している場合
-                    $situation_image = get_field('situation_image', 'situation_' . $situation_term->term_id);
-            ?>
-                    <a href="<?php echo esc_url(get_post_type_archive_link('store') . '?situation_filter[]=' . $situation_term->slug . '&active_tab=situation'); ?>" class="medi-situation-item">
-                        <div class="medi-situation-item__image">
-                            <?php if ($situation_image) : ?>
-                                <img src="<?php echo esc_url($situation_image['url']); ?>" alt="<?php echo esc_attr($situation_term->name); ?>">
-                            <?php else : ?>
-                                <div class="default-situation-bg"></div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="medi-situation-item__overlay">
-                            <span class="medi-situation-item__text"><?php echo esc_html($situation_term->name); ?></span>
-                        </div>
-                    </a>
+        <?php // --- シチュエーションで選ぶセクション（修正版） --- ?>
+        <section class="medi-situation-section">
+            <div class="container">
+                <h2 class="medi-section-title">シチュエーションで選ぶ</h2>
+                <p class="medi-section-subtitle">大切な人との時間や、特別な日にぴったりのお店を見つけましょう。</p>
+                
+                <div class="medi-situation-grid">
+                    <?php
+                    $situation_terms = get_terms(array(
+                        'taxonomy' => 'situation',
+                        'hide_empty' => false,
+                        'orderby' => 'name',
+                        'order' => 'ASC'
+                    ));
+                    
+                    if (!empty($situation_terms) && !is_wp_error($situation_terms)) :
+                        foreach ($situation_terms as $situation_term) :
+                            // ACFでタクソノミーにカスタムフィールドを追加している場合
+                            $situation_image = get_field('situation_image', 'situation_' . $situation_term->term_id);
+                            
+                            // デフォルト画像を設定
+                            $default_image = get_stylesheet_directory_uri() . '/assets/images/default-situation.jpg';
+                    ?>
+                            <a href="<?php echo esc_url(get_post_type_archive_link('store') . '?situation_filter[]=' . $situation_term->slug . '&active_tab=situation'); ?>" class="medi-situation-item">
+                                <div class="medi-situation-item__image">
+                                    <?php if ($situation_image && !empty($situation_image['url'])) : ?>
+                                        <img src="<?php echo esc_url($situation_image['url']); ?>" alt="<?php echo esc_attr($situation_term->name); ?>">
+                                    <?php else : ?>
+                                        <img src="<?php echo esc_url($default_image); ?>" alt="<?php echo esc_attr($situation_term->name); ?>">
+                                    <?php endif; ?>
+                                </div>
+                                <div class="medi-situation-item__overlay">
+                                    <span class="medi-situation-item__text"><?php echo esc_html($situation_term->name); ?></span>
+                                </div>
+                            </a>
+                    <?php 
+                        endforeach;
+                    endif;
+                    ?>
+                </div>
+            </div>
+        </section>
+        
+        <?php // --- ジャンルで選ぶセクション --- ?>
+        <!-- 既存のジャンルセクションコード -->
+        
+    </div>
+    
+    <?php // --- サイドバー広告 --- ?>
+    <aside class="homepage-sidebar">
+        <div class="sidebar-ads-container">
             <?php 
-                endforeach;
-            endif;
+            // Ad Inserterの広告を最大16個表示
+            if (function_exists('ai_content')) {
+                for ($i = 1; $i <= 16; $i++) {
+                    $ad_content = ai_content($i);
+                    if (!empty($ad_content)) {
+                        echo '<div class="sidebar-ad-item">';
+                        echo $ad_content;
+                        echo '</div>';
+                    }
+                }
+            }
             ?>
         </div>
-    </div>
-</section>
+    </aside>
+</div>
 
         <?php // --- ジャンルで選ぶセクション --- ?>
         <section class="medi-genre-section">
@@ -343,3 +422,17 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
 </div>
 
 <?php get_footer(); ?>
+
+<?php
+// デバッグ用（確認後削除）
+if (current_user_can('administrator')) {
+    echo '<pre style="background: #fff; padding: 20px; margin: 20px;">';
+    echo 'Header Content Type: ' . $dp_options['header_content_type'] . "\n";
+    echo 'Header BG Image: ' . $dp_options['header_bg_image'] . "\n";
+    echo 'Header BG Video: ' . $dp_options['header_bg_video'] . "\n";
+    for ($i = 1; $i <= 5; $i++) {
+        echo 'Slider Image ' . $i . ': ' . $dp_options['slider_image' . $i] . "\n";
+    }
+    echo '</pre>';
+}
+?>

@@ -74,13 +74,41 @@ $store_detail_fields = [
 $address_for_map = get_field('store_address', $store_id);
 ?>
 
-<?php // --- ヒーローセクション --- ?>
+<?php // --- ヒーローセクション（SNS改善版） --- ?>
 <div class="store-hero <?php echo $background_image_url ? 'has-background-image' : 'no-background-image'; ?>"
     <?php if ($background_image_url) : ?>
         style="background-image: url('<?php echo esc_url($background_image_url); ?>');"
     <?php endif; ?>
 >
     <div class="store-hero__overlay"></div>
+    
+    <?php // SNSフローティングボタン ?>
+    <?php
+    $has_sns = false;
+    ob_start();
+    foreach ($hero_sns_definitions as $sns_key => $sns_item) {
+        if (get_field($sns_item['field'], $store_id)) {
+            $has_sns = true;
+            $url = get_field($sns_item['field'], $store_id);
+            ?>
+            <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer" 
+               class="store-hero__sns-float store-hero__sns-float--<?php echo $sns_key; ?>" 
+               title="<?php echo esc_attr($sns_item['alt']); ?>">
+                <img src="<?php echo esc_url($icon_base_path . $sns_item['icon']); ?>" 
+                     alt="<?php echo esc_attr($sns_item['alt']); ?>" 
+                     class="store-hero__sns-icon">
+            </a>
+            <?php
+        }
+    }
+    $sns_icons_html = ob_get_clean();
+    
+    if ($has_sns) : ?>
+        <div class="store-hero__sns-container">
+            <?php echo $sns_icons_html; ?>
+        </div>
+    <?php endif; ?>
+    
     <div class="store-hero__content">
         <div class="container">
             <div class="store-hero__main-info">
@@ -90,29 +118,6 @@ $address_for_map = get_field('store_address', $store_id);
                     <div class="store-hero__location">
                         <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="地域" class="store-hero__location-icon">
                         <span class="store-hero__location-text"><?php echo $prefecture_display; ?></span>
-                    </div>
-                <?php endif; ?>
-                
-                <?php
-                // SNSアイコンの表示
-                $has_sns = false;
-                ob_start();
-                foreach ($hero_sns_definitions as $sns_item) {
-                    if (get_field($sns_item['field'], $store_id)) {
-                        $has_sns = true;
-                        $url = get_field($sns_item['field'], $store_id);
-                        ?>
-                        <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer" class="store-hero__social-link" title="<?php echo esc_attr($sns_item['alt']); ?>">
-                            <img src="<?php echo esc_url($icon_base_path . $sns_item['icon']); ?>" alt="<?php echo esc_attr($sns_item['alt']); ?>" class="store-hero__social-icon">
-                        </a>
-                        <?php
-                    }
-                }
-                $sns_icons_html = ob_get_clean();
-
-                if ($has_sns) : ?>
-                    <div class="store-hero__social">
-                        <?php echo $sns_icons_html; ?>
                     </div>
                 <?php endif; ?>
             </div>

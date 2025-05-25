@@ -275,6 +275,78 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     z-index: 1;
 }
 
+.store-hero__sns-container {
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.store-hero__sns-float {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.store-hero__sns-float::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.3));
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.store-hero__sns-float:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+}
+
+.store-hero__sns-float:hover::before {
+    transform: translateX(0);
+}
+
+.store-hero__sns-float--instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.store-hero__sns-float--x:hover {
+    background: #000;
+}
+
+.store-hero__sns-float--facebook:hover {
+    background: #1877f2;
+}
+
+.store-hero__sns-float--tiktok:hover {
+    background: #000;
+}
+
+.store-hero__sns-float:hover .store-hero__sns-icon {
+    filter: brightness(0) invert(1);
+}
+
+.store-hero__sns-icon {
+    width: 26px;
+    height: 26px;
+    transition: all 0.3s ease;
+}
+
 .store-hero::before {
     content: '';
     position: absolute;
@@ -762,6 +834,20 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
 }
 
 @media (max-width: 768px) {
+
+    .store-hero__sns-container {
+        position: static;
+        flex-direction: row;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 12px;
+    }
+    
+    .store-hero__sns-float {
+        width: 44px;
+        height: 44px;
+    }
+    
     .store-hero {
         min-height: 400px;
         padding: 40px 0;
@@ -1131,6 +1217,23 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     .store-list-container {
         grid-template-columns: repeat(3, 1fr);
     }
+
+    .homepage-content-with-sidebar {
+        flex-direction: column;
+    }
+    
+    .homepage-sidebar {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .sidebar-ads-container {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1149,6 +1252,14 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     
     .store-search-filter-panels {
         padding: 20px 15px;
+    }
+
+    .sidebar-ads-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .medi-situation-grid {
+        grid-template-columns: 1fr;
     }
     
 /* チェックマーク削除・クリーンボタンスタイル修正版 */
@@ -1702,12 +1813,69 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
    ヒーローセクション
    ===================================== */
 .medi-hero-section {
-    background: linear-gradient(135deg, #f8f9ff 0%, #fff5f8 50%, #f0f8ff 100%);
-    padding: 100px 0 80px;
     position: relative;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
 }
 
+.medi-hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.medi-hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-top: 100px; /* 検索バーを下に配置 */
+}
+
+/* ホームページレイアウト修正 */
+.homepage-content-with-sidebar {
+    display: flex;
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.homepage-main-content {
+    flex: 1;
+    max-width: 900px;
+}
+
+.homepage-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+/* サイドバー広告 */
+.sidebar-ads-container {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-ad-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
 /* 背景の装飾図形 */
 .medi-hero-section__bg-shapes {
     position: absolute;
@@ -1755,6 +1923,7 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-20px) rotate(5deg); }
 }
+
 
 .medi-hero-section__content {
     display: flex;
@@ -2251,8 +2420,8 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
 
 .medi-situation-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
 .medi-situation-item {
@@ -2308,8 +2477,11 @@ body.admin-bar .site-header-custom.is-fixed-header { /* is-fixed-headerクラス
 .medi-situation-item__text {
     color: #fff;
     font-size: 18px;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 16px;
+    border-radius: 20px;
 }
 
 /* =====================================
