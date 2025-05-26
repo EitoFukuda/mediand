@@ -113,7 +113,7 @@ $address_for_map = get_field('store_address', $store_id);
         <div class="container">
         <div class="store-hero__main-info">
         <h1 class="store-hero__name"><?php echo esc_html($store_title); ?></h1>
-        
+    
         <?php if ($prefecture_display) : ?>
             <div class="store-hero__location">
                 <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="地域" class="store-hero__location-icon">

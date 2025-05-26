@@ -26,6 +26,15 @@ function medi_gensen_child_enqueue_assets() {
     // jQueryを確実に読み込む
     wp_enqueue_script('jquery');
 
+    // 背景装飾JavaScriptをすべてのページで読み込み
+    wp_enqueue_script(
+        'background-decorations',
+        get_stylesheet_directory_uri() . '/js/background-decorations.js',
+        array('jquery'),
+        wp_get_theme()->get('Version'),
+        true
+    );
+
     // トップページでのJavaScript読み込み
     if (is_front_page() || is_home()) {
         wp_enqueue_script(
@@ -75,16 +84,91 @@ function medi_gensen_child_enqueue_assets() {
 add_action('wp_enqueue_scripts', 'medi_gensen_child_enqueue_assets');
 
 /**
+ * TCDオプション値の安全な取得用ヘルパー関数
+ * 
+ * @param string $key 取得したいキー
+ * @param mixed $default デフォルト値
+ * @return mixed
+ */
+if (!function_exists('get_safe_tcd_option')) {
+    function get_safe_tcd_option($key, $default = '') {
+        global $dp_options;
+        
+        // オプションが読み込まれていない場合は読み込む
+        if (!$dp_options) {
+            $dp_options = get_desing_plus_option();
+        }
+        
+        // オプションが配列でない場合はデフォルト値を返す
+        if (!is_array($dp_options)) {
+            return $default;
+        }
+        
+        // キーが存在する場合はその値を、存在しない場合はデフォルト値を返す
+        return isset($dp_options[$key]) ? $dp_options[$key] : $default;
+    }
+}
+
+/**
+ * デバッグ情報の安全な出力
+ * 
+ * @param string $message メッセージ
+ * @param mixed $data データ（オプション）
+ */
+if (!function_exists('medi_debug_log')) {
+    function medi_debug_log($message, $data = null) {
+        if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('administrator')) {
+            if ($data !== null) {
+                error_log('[medi& Debug] ' . $message . ': ' . print_r($data, true));
+            } else {
+                error_log('[medi& Debug] ' . $message);
+            }
+        }
+    }
+}
+
+/**
+ * TCDテーマオプションの初期化チェック
+ */
+function medi_check_tcd_options() {
+    global $dp_options;
+    
+    if (!function_exists('get_desing_plus_option')) {
+        medi_debug_log('TCD GENSEN theme function get_desing_plus_option() not found');
+        return false;
+    }
+    
+    if (!$dp_options) {
+        $dp_options = get_desing_plus_option();
+        if (is_array($dp_options)) {
+            medi_debug_log('TCD options loaded', array_keys($dp_options));
+        }
+    }
+    
+    return is_array($dp_options);
+}
+
+// 初期化時にTCDオプションをチェック
+add_action('init', 'medi_check_tcd_options');
+
+/**
+ * フロントページでのみデバッグ情報を非表示にする
+ */
+function medi_disable_frontend_debug() {
+    if (!is_admin() && !current_user_can('administrator')) {
+        // 非管理者には警告を表示しない
+        error_reporting(E_ERROR | E_PARSE);
+    }
+}
+add_action('template_redirect', 'medi_disable_frontend_debug');
+
+/**
  * Enqueue Stagewise Toolbar in development mode.
  */
 function medi_gensen_child_enqueue_stagewise_toolbar() {
     // WP_DEBUG を開発モードの判定に使用します。
-    // または、より具体的な開発環境判定 (例: in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1'])) を使用することもできます。
     if (defined('WP_DEBUG') && WP_DEBUG) {
         // Stagewiseツールバー本体のスクリプトをエンキュー
-        // 重要: PATH_TO_STAGEWISE_TOOLBAR_JS を実際のパスに置き換えてください。
-        // 例: get_stylesheet_directory_uri() . '/node_modules/@stagewise/toolbar/dist/toolbar.umd.js'
-        // パッケージのバージョンやビルド方法によってパスは異なります。
         wp_enqueue_script(
             'stagewise-toolbar-main',
             'PATH_TO_STAGEWISE_TOOLBAR_JS', // ここを修正してください
@@ -101,12 +185,9 @@ function medi_gensen_child_enqueue_stagewise_toolbar() {
             wp_get_theme()->get('Version'),
             true
         );
-
-        // Stagewiseツールバーが必要とするCSSがあれば、同様にエンキューします。
-        // 例: wp_enqueue_style('stagewise-toolbar-style', get_stylesheet_directory_uri() . '/node_modules/@stagewise/toolbar/dist/toolbar.css');
     }
 }
-add_action( 'wp_enqueue_scripts', 'medi_gensen_child_enqueue_stagewise_toolbar', 999 ); // 他のスクリプトより後に実行されるように優先度を調整
+add_action( 'wp_enqueue_scripts', 'medi_gensen_child_enqueue_stagewise_toolbar', 999 );
 
 /**
  * ナビゲーションメニューの登録
@@ -170,11 +251,10 @@ function medi_gensen_child_customize_search_query($query) {
 
         // 各タクソノミーフィルターの処理
         $taxonomies = array(
-            'prefecture' => 'prefecture',
-            'genre' => 'genre',
+            'prefecture_filter' => 'prefecture',
+            'genre_filter' => 'genre',
             'feeling_filter' => 'feeling',
-            'situation_filter' => 'situation',
-            'genre_filter' => 'genre'
+            'situation_filter' => 'situation'
         );
 
         foreach ($taxonomies as $param => $taxonomy) {
@@ -498,143 +578,4 @@ function medi_admin_styles() {
     </style>';
 }
 add_action('admin_head', 'medi_admin_styles');
-
-// タクソノミーターム用のACFフィールドグループを作成
-if( function_exists('acf_add_local_field_group') ):
-    acf_add_local_field_group(array(
-        'key' => 'group_feeling_icon',
-        'title' => 'アイコン設定',
-        'fields' => array(
-            array(
-                'key' => 'field_feeling_icon',
-                'label' => 'アイコン画像',
-                'name' => 'feeling_icon',
-                'type' => 'image',
-                'return_format' => 'array',
-                'preview_size' => 'thumbnail',
-            ),
-        ),
-        'location' => array(
-            array(
-                array(
-                    'param' => 'taxonomy',
-                    'operator' => '==',
-                    'value' => 'feeling',
-                ),
-            ),
-        ),
-    ));
-endif;
-
-// シチュエーションタクソノミー用のACFフィールド
-if( function_exists('acf_add_local_field_group') ):
-    acf_add_local_field_group(array(
-        'key' => 'group_situation_image',
-        'title' => '画像設定',
-        'fields' => array(
-            array(
-                'key' => 'field_situation_image',
-                'label' => 'シチュエーション画像',
-                'name' => 'situation_image',
-                'type' => 'image',
-                'return_format' => 'array',
-                'preview_size' => 'medium',
-            ),
-        ),
-        'location' => array(
-            array(
-                array(
-                    'param' => 'taxonomy',
-                    'operator' => '==',
-                    'value' => 'situation',
-                ),
-            ),
-        ),
-    ));
-endif;
-
-wp_enqueue_script(
-    'background-decorations',
-    get_stylesheet_directory_uri() . '/js/background-decorations.js',
-    array('jquery'),
-    wp_get_theme()->get('Version'),
-    true
-);
-
-/**
- * TCDオプション値の安全な取得用ヘルパー関数
- * 
- * @param array $options オプション配列
- * @param string $key 取得したいキー
- * @param mixed $default デフォルト値
- * @return mixed
- */
-function get_safe_tcd_option($key, $default = '') {
-    global $dp_options;
-    
-    // オプションが読み込まれていない場合は読み込む
-    if (!$dp_options) {
-        $dp_options = get_desing_plus_option();
-    }
-    
-    // オプションが配列でない場合はデフォルト値を返す
-    if (!is_array($dp_options)) {
-        return $default;
-    }
-    
-    // キーが存在する場合はその値を、存在しない場合はデフォルト値を返す
-    return isset($dp_options[$key]) ? $dp_options[$key] : $default;
-}
-
-/**
- * デバッグ情報の安全な出力
- * 
- * @param string $message メッセージ
- * @param mixed $data データ（オプション）
- */
-function medi_debug_log($message, $data = null) {
-    if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('administrator')) {
-        if ($data !== null) {
-            error_log('[medi& Debug] ' . $message . ': ' . print_r($data, true));
-        } else {
-            error_log('[medi& Debug] ' . $message);
-        }
-    }
-}
-
-/**
- * TCDテーマオプションの初期化チェック
- */
-function medi_check_tcd_options() {
-    global $dp_options;
-    
-    if (!function_exists('get_desing_plus_option')) {
-        medi_debug_log('TCD GENSEN theme function get_desing_plus_option() not found');
-        return false;
-    }
-    
-    if (!$dp_options) {
-        $dp_options = get_desing_plus_option();
-        medi_debug_log('TCD options loaded', array_keys($dp_options));
-    }
-    
-    return is_array($dp_options);
-}
-
-// 初期化時にTCDオプションをチェック
-add_action('init', 'medi_check_tcd_options');
-
-/**
- * フロントページでのみデバッグ情報を非表示にする
- */
-function medi_disable_frontend_debug() {
-    if (!is_admin() && !current_user_can('administrator')) {
-        // 非管理者には警告を表示しない
-        error_reporting(E_ERROR | E_PARSE);
-    }
-}
-add_action('template_redirect', 'medi_disable_frontend_debug');
-
 ?>
-
-

@@ -88,7 +88,12 @@ jQuery(document).ready(function($) {
             // 選択解除
             console.log('[Archive Filters] Deselecting region:', regionId);
             $button.removeClass('is-selected');
-            $prefectureGroups.slideUp(200);
+            
+            // 全ての都道府県グループを非表示
+            $prefectureGroups.slideUp(200, function() {
+                $(this).hide().removeClass('active');
+            });
+            
             $prefecturesPlaceholder.text('地方を選択してください').slideDown(200);
             
             // 対応する都道府県選択もクリア
@@ -103,12 +108,16 @@ jQuery(document).ready(function($) {
             $regionButtons.removeClass('is-selected');
             $button.addClass('is-selected');
             
-            $prefectureGroups.slideUp(200);
-            $prefecturesPlaceholder.slideUp(200);
+            // 全ての都道府県グループを非表示
+            $prefectureGroups.slideUp(200, function() {
+                $(this).hide().removeClass('active');
+            });
             
+            // 対象の都道府県グループのみ表示
             const $targetGroup = $(`[data-parent-region-id="${regionId}"]`);
             if ($targetGroup.length && $targetGroup.find('label').length) {
-                $targetGroup.slideDown(300);
+                $targetGroup.slideDown(300).addClass('active');
+                $prefecturesPlaceholder.hide();
                 console.log('[Archive Filters] Prefecture group displayed for region:', regionId);
             } else {
                 $prefecturesPlaceholder.text('この地方の都道府県は登録されていません。').slideDown(200);
