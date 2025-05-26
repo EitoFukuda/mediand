@@ -552,6 +552,89 @@ if( function_exists('acf_add_local_field_group') ):
         ),
     ));
 endif;
+
+wp_enqueue_script(
+    'background-decorations',
+    get_stylesheet_directory_uri() . '/js/background-decorations.js',
+    array('jquery'),
+    wp_get_theme()->get('Version'),
+    true
+);
+
+/**
+ * TCDオプション値の安全な取得用ヘルパー関数
+ * 
+ * @param array $options オプション配列
+ * @param string $key 取得したいキー
+ * @param mixed $default デフォルト値
+ * @return mixed
+ */
+function get_safe_tcd_option($key, $default = '') {
+    global $dp_options;
+    
+    // オプションが読み込まれていない場合は読み込む
+    if (!$dp_options) {
+        $dp_options = get_desing_plus_option();
+    }
+    
+    // オプションが配列でない場合はデフォルト値を返す
+    if (!is_array($dp_options)) {
+        return $default;
+    }
+    
+    // キーが存在する場合はその値を、存在しない場合はデフォルト値を返す
+    return isset($dp_options[$key]) ? $dp_options[$key] : $default;
+}
+
+/**
+ * デバッグ情報の安全な出力
+ * 
+ * @param string $message メッセージ
+ * @param mixed $data データ（オプション）
+ */
+function medi_debug_log($message, $data = null) {
+    if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('administrator')) {
+        if ($data !== null) {
+            error_log('[medi& Debug] ' . $message . ': ' . print_r($data, true));
+        } else {
+            error_log('[medi& Debug] ' . $message);
+        }
+    }
+}
+
+/**
+ * TCDテーマオプションの初期化チェック
+ */
+function medi_check_tcd_options() {
+    global $dp_options;
+    
+    if (!function_exists('get_desing_plus_option')) {
+        medi_debug_log('TCD GENSEN theme function get_desing_plus_option() not found');
+        return false;
+    }
+    
+    if (!$dp_options) {
+        $dp_options = get_desing_plus_option();
+        medi_debug_log('TCD options loaded', array_keys($dp_options));
+    }
+    
+    return is_array($dp_options);
+}
+
+// 初期化時にTCDオプションをチェック
+add_action('init', 'medi_check_tcd_options');
+
+/**
+ * フロントページでのみデバッグ情報を非表示にする
+ */
+function medi_disable_frontend_debug() {
+    if (!is_admin() && !current_user_can('administrator')) {
+        // 非管理者には警告を表示しない
+        error_reporting(E_ERROR | E_PARSE);
+    }
+}
+add_action('template_redirect', 'medi_disable_frontend_debug');
+
 ?>
 
 
