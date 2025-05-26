@@ -224,7 +224,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 ======================================================================== */
 .medi-hero-section {
     position: relative;
-    min-height: 600px;
+    min-height: 1080px;    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -362,6 +362,28 @@ body.admin-bar .site-header-custom.is-fixed-header {
 /* ========================================================================
    5. トップページ - コンテンツレイアウト
 ======================================================================== */
+.medi-recommend-section,
+.medi-region-section,
+.medi-feeling-section,
+.medi-situation-section,
+.medi-genre-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.main-content-with-sidebar {
+    display: flex;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.main-content-area {
+    flex: 1;
+    min-width: 0; /* フレックスアイテムの収縮を許可 */
+}
+
 .homepage-content-with-sidebar {
     display: flex;
     gap: 40px;
@@ -376,8 +398,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 .homepage-sidebar {
-    width: 300px;
-    flex-shrink: 0;
+    flex: 0 0 300px; /* 固定幅のサイドバー */
+    position: sticky;
+    top: 100px;
+    height: fit-content;
 }
 
 .sidebar-ads-container {
@@ -395,6 +419,31 @@ body.admin-bar .site-header-custom.is-fixed-header {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     text-align: center;
 }
+
+.sidebar-ad-area {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+.sidebar-ad-area:last-child {
+    margin-bottom: 0;
+}
+
+/* Ad Inserter用スタイル */
+.sidebar-ad-area .adinserter {
+    text-align: center;
+}
+
+.sidebar-ad-area img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
 
 /* ========================================================================
    6. トップページ - 新着店舗セクション
@@ -610,10 +659,12 @@ body.admin-bar .site-header-custom.is-fixed-header {
 @keyframes slideDown {
     from {
         opacity: 0;
+        transform: translateY(-10px);
         max-height: 0;
     }
     to {
         opacity: 1;
+        transform: translateY(0);
         max-height: 200px;
     }
 }
@@ -1022,11 +1073,13 @@ body.admin-bar .site-header-custom.is-fixed-header {
     border-color: #adb5bd;
 }再試行福続ける編集css/* 都道府県エリア */
 .filter-region__prefectures-wrapper {
-   width: 100%;
-   margin-top: 20px;
-   padding-top: 20px;
-   border-top: 2px solid #f1f3f4;
-   position: relative;
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #f1f3f4;
+    position: relative;
+    /* 右側表示から下側表示に変更 */
+    display: block;
 }
 
 .filter-region__prefectures-wrapper::before {
@@ -1042,10 +1095,15 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 .filter-region__prefecture-group {
-   display: none;
-   flex-wrap: wrap;
-   gap: 10px;
-   animation: slideIn 0.3s ease-out;
+    display: none;
+    flex-wrap: wrap;
+    gap: 10px;
+    animation: slideDown 0.3s ease-out;
+    margin-top: 15px;
+}
+
+.filter-region__prefecture-group.show {
+    display: flex;
 }
 
 @keyframes slideIn {
@@ -1349,6 +1407,37 @@ body.admin-bar .site-header-custom.is-fixed-header {
    bottom: 0;
    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
    z-index: 1;
+}
+
+/* --- 店舗詳細ページ：SNS位置調整 --- */
+.store-hero__social {
+    margin-top: 15px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.store-hero__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.store-hero__social-link:hover {
+    background-color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.store-hero__social-icon {
+    width: 20px;
+    height: 20px;
 }
 
 .store-hero__sns-container {
@@ -1884,6 +1973,17 @@ body.admin-bar .site-header-custom.is-fixed-header {
     overflow: hidden;
 }
 
+/* 特定セクションのみ背景アニメーションを表示 */
+.medi-recommend-section .bg-decorations-container,
+.medi-region-section .bg-decorations-container,
+.medi-feeling-section .bg-decorations-container,
+.medi-situation-section .bg-decorations-container,
+.medi-genre-section .bg-decorations-container,
+.store-content-wrapper .bg-decorations-container {
+    display: block;
+}
+
+
 .bg-decoration-circle {
     position: absolute;
     border-radius: 50%;
@@ -1980,9 +2080,34 @@ body.admin-bar .site-header-custom.is-fixed-header {
    .store-list-container {
        grid-template-columns: repeat(2, 1fr);
    }
+
+   .main-content-with-sidebar {
+    flex-direction: column;
+}
+
+.homepage-sidebar {
+    flex: none;
+    position: static;
+    width: 100%;
+}
+
+.sidebar-ad-area {
+    margin-bottom: 30px;
+}
 }
 
 @media (max-width: 768px) {
+    .medi-hero-section {
+        background-attachment: scroll; /* モバイルでは固定背景を無効 */
+    }
+
+    .medi-hero-section {
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+
    .site-footer-custom__logo-area {
        text-align: center;
        margin-bottom: 30px;
@@ -2083,6 +2208,15 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
    .bg-decoration-circle {
     filter: blur(1px); /* モバイルでは少し強めのブラー */
+}
+
+.main-content-with-sidebar {
+    padding: 0 15px;
+    gap: 30px;
+}
+
+.sidebar-ad-area {
+    padding: 15px;
 }
 
 }

@@ -111,16 +111,39 @@ $address_for_map = get_field('store_address', $store_id);
     
     <div class="store-hero__content">
         <div class="container">
-            <div class="store-hero__main-info">
-                <h1 class="store-hero__name"><?php echo esc_html($store_title); ?></h1>
-                
-                <?php if ($prefecture_display) : ?>
-                    <div class="store-hero__location">
-                        <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="地域" class="store-hero__location-icon">
-                        <span class="store-hero__location-text"><?php echo $prefecture_display; ?></span>
-                    </div>
-                <?php endif; ?>
+        <div class="store-hero__main-info">
+        <h1 class="store-hero__name"><?php echo esc_html($store_title); ?></h1>
+        
+        <?php if ($prefecture_display) : ?>
+            <div class="store-hero__location">
+                <img src="<?php echo esc_url($icon_base_path . 'pin.png'); ?>" alt="地域" class="store-hero__location-icon">
+                <span class="store-hero__location-text"><?php echo $prefecture_display; ?></span>
             </div>
+        <?php endif; ?>
+        
+        <?php
+        // SNSアイコンの表示判定とループ
+        $has_sns_hero = false;
+        ob_start(); // アイコン出力を一旦バッファに保存
+        foreach ($hero_sns_definitions as $sns_item) {
+            if (get_field($sns_item['field'], $store_id)) {
+                $has_sns_hero = true;
+                $url = get_field($sns_item['field'], $store_id);
+                ?>
+                <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer" class="store-hero__social-link" title="<?php echo esc_attr($sns_item['alt']); ?>">
+                    <img src="<?php echo esc_url($icon_base_path . $sns_item['icon']); ?>" alt="<?php echo esc_attr($sns_item['alt']); ?>" class="store-hero__social-icon">
+                </a>
+                <?php
+            }
+        }
+        $sns_icons_html = ob_get_clean();
+
+        if ($has_sns_hero) : ?>
+            <div class="store-hero__social">
+                <?php echo $sns_icons_html; // バッファしたアイコンHTMLを出力 ?>
+            </div>
+        <?php endif; ?>
+    </div>
         </div>
     </div>
 </div>

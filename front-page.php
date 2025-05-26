@@ -37,9 +37,12 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
 <div class="homepage-wrapper">
     
     <?php // --- カスタムヒーローセクション --- ?>
-    <section class="medi-hero-section" <?php 
-        $hero_bg_image = get_safe_option($dp_options, 'hero_background_image', '');
-        if ($hero_bg_image) : ?>style="background-image: url('<?php echo esc_url($hero_bg_image); ?>');"<?php endif; ?>>
+    <section class="medi-hero-section" style="background-image: url('<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png');">
+        <div class="medi-hero-section__bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
         
         <?php 
         $hero_video_url = get_safe_option($dp_options, 'hero_video_url', '');
@@ -49,19 +52,9 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
         </video>
         <?php endif; ?>
         
-        <div class="medi-hero-overlay"></div>
-        
+       
         <div class="container">
             <div class="medi-hero-content">
-                <h1 class="medi-hero-title">
-                    <span class="title-sns">SNS</span>
-                    <span class="title-kara">から</span>
-                    <span class="title-real">リアルへ</span>
-                </h1>
-                <p class="medi-hero-description">
-                    SNSで見つけた素敵なお店を、実際に体験してみませんか？<br>
-                    あなたの気分やシチュエーションに合わせて、最適なお店を見つけましょう。
-                </p>
                 
                 <div class="medi-hero-search">
                     <form action="<?php echo esc_url(home_url('/')); ?>" method="get" class="medi-hero-search-form">
@@ -121,6 +114,8 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
     </section>
 
     <div class="homepage-content-wrapper">
+        <div class="main-content-with-sidebar">
+            <div class="main-content-area">
         
         <?php // --- おすすめセクション（スライダー版） --- ?>
         <section class="medi-recommend-section">
@@ -219,14 +214,12 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                     <?php
                     // 地方の順番を定義
                     $region_order = array(
-                        '北海道/東北',
+                        '北海道・東北',
                         '関東',
                         '中部',
-                        '近畿',
-                        '中国',
-                        '四国',
-                        '九州',
-                        '沖縄'
+                        '関西',
+                        '中国・四国',
+                        '九州・沖縄'
                     );
                     
                     $region_terms = get_terms(array(
@@ -420,11 +413,34 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                     ?>
                 </div>
             </div>
-        </section>
-
+            
+            <?php // --- 右サイドバー（広告欄） --- ?>
+            <aside class="homepage-sidebar">
+                <div class="sidebar-ad-area">
+                    <?php
+                    // Ad Inserterのショートコードまたは関数を使用
+                    if (function_exists('adinserter')) {
+                        echo adinserter(1); // Ad Inserter の Block 1
+                    }
+                    
+                    // または、ショートコードを使用する場合
+                    // echo do_shortcode('[adinserter block="1"]');
+                    ?>
+                </div>
+                
+                <?php // 追加の広告スペース ?>
+                <div class="sidebar-ad-area">
+                    <?php
+                    if (function_exists('adinserter')) {
+                        echo adinserter(2); // Ad Inserter の Block 2
+                    }
+                    ?>
+                </div>
+            </aside>
+        </div>
     </div>
 
-    <?php // --- サイドバー（広告欄） --- ?>
+    <?php // --- フッター広告エリア --- ?>
     <aside class="medi-sidebar">
         <div class="container">
             <?php 
