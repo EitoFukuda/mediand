@@ -24,16 +24,17 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
 
 <div class="homepage-wrapper">
     
-    <?php // --- フルスクリーンヒーローセクション --- ?>
-    <section class="medi-hero-section medi-hero-section--fullscreen" style="background-image: url('<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png');">
-        
-        <!-- 動的背景要素 -->
-        <div class="medi-hero-section__bg-effects">
-            <div class="bg-particle bg-particle--1"></div>
-            <div class="bg-particle bg-particle--2"></div>
-            <div class="bg-particle bg-particle--3"></div>
-            <div class="bg-particle bg-particle--4"></div>
-            <div class="bg-particle bg-particle--5"></div>
+<?php // --- フルスクリーンヒーローセクション --- ?>
+<section class="medi-hero-section medi-hero-section--fullscreen" style="background-image: url('<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png');">
+    
+    <!-- 動的背景要素 -->
+    <div class="medi-hero-section__bg-effects">
+        <div class="bg-particle bg-particle--1"></div>
+        <div class="bg-particle bg-particle--2"></div>
+        <div class="bg-particle bg-particle--3"></div>
+        <div class="bg-particle bg-particle--4"></div>
+        <div class="bg-particle bg-particle--5"></div>
+    </div>
             
             <!-- 光のライン -->
             <div class="light-lines">
@@ -44,22 +45,6 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
         </div>
         
         <div class="container medi-hero-section__container">
-            <!-- メインコンテンツ（中央） -->
-            <div class="medi-hero-section__main-content">
-                <div class="medi-hero-section__title-wrapper">
-                    <h1 class="medi-hero-section__title">
-                        <span class="title-line title-line--sns" data-text="SNS">SNS</span>
-                        <span class="title-line title-line--kara" data-text="から">から</span>
-                        <span class="title-line title-line--real" data-text="リアルへ">リアルへ</span>
-                    </h1>
-                    <div class="medi-hero-section__subtitle-wrapper">
-                        <p class="medi-hero-section__subtitle">
-                            <span class="subtitle-text">SNSで見つけた素敵なお店を、実際に体験してみませんか？</span>
-                            <span class="subtitle-text">あなたの気分やシチュエーションに合わせて、最適なお店を見つけましょう。</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
             
             <!-- 検索フォーム（下部） -->
             <div class="medi-hero-section__search-wrapper">

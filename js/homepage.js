@@ -32,42 +32,151 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // =====================================
-// 新着店舗スライダー
+// =====================================
+// 新着店舗スライダー（改良版）
 // =====================================
 function initRecommendSlider() {
-    const slider = document.getElementById('recommendSlider');
-    const prevBtn = document.getElementById('recommendPrev');
-    const nextBtn = document.getElementById('recommendNext');
+    const $slider = $('#recommendSlider');
+    const $prevBtn = $('#recommendPrev');
+    const $nextBtn = $('#recommendNext');
     
-    if (!slider || !prevBtn || !nextBtn) return;
-    
-    let currentIndex = 0;
-    const slides = slider.querySelectorAll('.medi-recommend-slide');
-    const totalSlides = slides.length;
-    const slidesPerView = 4;
-    const maxIndex = Math.max(0, totalSlides - slidesPerView);
-    
-    function updateSlider() {
-        const translateX = -currentIndex * (100 / slidesPerView);
-        slider.style.transform = `translateX(${translateX}%)`;
+    if (!$slider.length || !$prevBtn.length || !$nextBtn.length) {
+        console.log('[medi& Homepage] Slider elements not found');
+        return;
     }
     
-    prevBtn.addEventListener('click', () => {
-        currentIndex = Math.max(0, currentIndex - 1);
+    let currentIndex = 0;
+    const $slides = $slider.find('.medi-recommend-slide');
+    const totalSlides = $slides.length;
+    let slidesPerView = 4;
+    let autoSlideInterval;
+    
+    // レスポンシブ対応
+    function updateSlidesPerView() {
+        const width = $(window).width();
+        if (width <= 768) {
+            slidesPerView = 1;
+        } else if (width <= 992) {
+            slidesPerView = 2;
+        } else if (width <= 1200) {
+            slidesPerView = 3;
+        } else {
+            slidesPerView = 4;
+        }
+    }
+    
+    function updateSlider(animate = true) {
+        const slideWidth = 100 / slidesPerView;
+        const translateX = -(currentIndex * slideWidth);
+        
+        if (animate) {
+            $slider.css('transform', `translateX(${translateX}%)`);
+        } else {
+            $slider.css({
+                'transition': 'none',
+                'transform': `translateX(${translateX}%)`
+            });
+            setTimeout(() => {
+                $slider.css('transition', '');
+            }, 50);
+        }
+        
+        // ボタンの有効/無効
+        $prevBtn.prop('disabled', currentIndex === 0);
+        $nextBtn.prop('disabled', currentIndex >= totalSlides - slidesPerView);
+        
+        console.log('[medi& Homepage] Slider updated:', currentIndex, 'of', totalSlides);
+    }
+    
+    function nextSlide() {
+        if (currentIndex < totalSlides - slidesPerView) {
+            currentIndex++;
+        } else {
+            currentIndex = 0; // 最後まで行ったら最初に戻る
+        }
         updateSlider();
+    }
+    
+    function prevSlide() {
+        if (currentIndex > 0) {
+            currentIndex--;
+        } else {
+            currentIndex = Math.max(0, totalSlides - slidesPerView); // 最初なら最後へ
+        }
+        updateSlider();
+    }
+    
+    function startAutoSlide() {
+        stopAutoSlide();
+        autoSlideInterval = setInterval(() => {
+            nextSlide();
+        }, 4000); // 4秒ごと
+    }
+    
+    function stopAutoSlide() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+        }
+    }
+    
+    // イベントリスナー
+    $prevBtn.on('click', () => {
+        stopAutoSlide();
+        prevSlide();
+        startAutoSlide();
     });
     
-    nextBtn.addEventListener('click', () => {
-        currentIndex = Math.min(maxIndex, currentIndex + 1);
-        updateSlider();
+    $nextBtn.on('click', () => {
+        stopAutoSlide();
+        nextSlide();
+        startAutoSlide();
     });
     
-    // 自動スライド
-    setInterval(() => {
-        currentIndex = (currentIndex + 1) > maxIndex ? 0 : currentIndex + 1;
-        updateSlider();
-    }, 5000);
+    // ホバー時は自動スライドを停止
+    $slider.on('mouseenter', stopAutoSlide);
+    $slider.on('mouseleave', startAutoSlide);
+    
+    // タッチ操作対応
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    $slider.on('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        stopAutoSlide();
+    });
+    
+    $slider.on('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+        startAutoSlide();
+    });
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                nextSlide(); // 左スワイプ
+            } else {
+                prevSlide(); // 右スワイプ
+            }
+        }
+    }
+    
+    // ウィンドウリサイズ対応
+    $(window).on('resize', () => {
+        updateSlidesPerView();
+        currentIndex = Math.min(currentIndex, Math.max(0, totalSlides - slidesPerView));
+        updateSlider(false);
+    });
+    
+    // 初期化
+    updateSlidesPerView();
+    updateSlider(false);
+    startAutoSlide();
+    
+    console.log('[medi& Homepage] Recommend slider initialized with', totalSlides, 'slides');
 }
 
     // =====================================

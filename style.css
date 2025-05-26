@@ -297,16 +297,6 @@ body.admin-bar .site-header-custom.is-fixed-header {
     25%, 100% { opacity: 0; }
 }
 
-.medi-hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 1;
-}
-
 .medi-hero-content {
     position: relative;
     z-index: 2;
@@ -413,35 +403,38 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .bg-particle {
     position: absolute;
     border-radius: 50%;
-    animation: float-particle 6s ease-in-out infinite;
+    animation: float-particle 8s ease-in-out infinite;
     opacity: 0.6;
 }
 
 .bg-particle--1 {
-    width: 60px;
-    height: 60px;
-    background: radial-gradient(circle, rgba(232, 180, 232, 0.3), transparent);
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(232, 180, 232, 0.6), transparent);
     top: 20%;
     left: 10%;
     animation-delay: 0s;
+    animation-duration: 10s;
 }
 
 .bg-particle--2 {
-    width: 40px;
-    height: 40px;
-    background: radial-gradient(circle, rgba(199, 125, 199, 0.4), transparent);
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(199, 125, 199, 0.7), transparent);
     top: 60%;
     right: 15%;
+    animation-duration: 12s;
     animation-delay: 2s;
 }
 
 .bg-particle--3 {
-    width: 80px;
-    height: 80px;
+    width: 150px;
+    height: 150px;
     background: radial-gradient(circle, rgba(221, 160, 221, 0.2), transparent);
     bottom: 30%;
     left: 20%;
     animation-delay: 4s;
+    animation-duration: 15s;
 }
 
 .bg-particle--4 {
@@ -469,6 +462,30 @@ body.admin-bar .site-header-custom.is-fixed-header {
     75% { transform: translateY(15px) translateX(-10px) scale(1.05); }
 }
 
+@keyframes float-particle-enhanced {
+    0%, 100% { 
+        transform: translateY(0px) translateX(0px) scale(1) rotate(0deg);
+        opacity: 0.3;
+    }
+    20% { 
+        transform: translateY(-40px) translateX(20px) scale(1.3) rotate(90deg);
+        opacity: 0.8;
+    }
+    40% { 
+        transform: translateY(-20px) translateX(-30px) scale(0.8) rotate(180deg);
+        opacity: 0.5;
+    }
+    60% { 
+        transform: translateY(30px) translateX(-20px) scale(1.2) rotate(270deg);
+        opacity: 0.9;
+    }
+    80% { 
+        transform: translateY(10px) translateX(40px) scale(1.1) rotate(360deg);
+        opacity: 0.4;
+    }
+}
+
+
 /* 光のライン */
 .light-lines {
     position: absolute;
@@ -481,9 +498,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .light-line {
     position: absolute;
-    height: 2px;
+    height: 3px;
     background: linear-gradient(90deg, transparent, rgba(232, 180, 232, 0.8), transparent);
-    animation: light-flow 8s linear infinite;
+    box-shadow: 0 0 10px rgba(232, 180, 232, 0.8);
+    animation: light-flow 6s linear infinite;
 }
 
 .light-line--1 {
@@ -511,6 +529,29 @@ body.admin-bar .site-header-custom.is-fixed-header {
     10% { opacity: 1; }
     90% { opacity: 1; }
     100% { transform: translateX(calc(100vw + 300px)); opacity: 0; }
+}
+
+/* 光のラインも強化 */
+@keyframes light-flow-enhanced {
+    0% { 
+        transform: translateX(0) scaleY(1);
+        opacity: 0;
+    }
+    10% { 
+        opacity: 1;
+        transform: translateX(calc(20vw)) scaleY(1.5);
+    }
+    50% {
+        transform: translateX(calc(50vw)) scaleY(2);
+    }
+    90% { 
+        opacity: 1;
+        transform: translateX(calc(80vw)) scaleY(1.5);
+    }
+    100% { 
+        transform: translateX(calc(100vw + 300px)) scaleY(1);
+        opacity: 0;
+    }
 }
 
 /* --- メインタイトル --- */
@@ -629,12 +670,12 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 .search-form-inner {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    bbackground: rgba(20, 20, 40, 0.95); /* より濃い背景色 */
+    backdrop-filter: blur(30px);
     border-radius: 20px;
     padding: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
 }
 
 .search-form-row {
@@ -667,8 +708,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .custom-select {
     width: 100%;
     padding: 15px 40px 15px 15px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
     color: #fff;
     font-size: 16px;
@@ -715,8 +756,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .search-input {
     width: 100%;
     padding: 15px 50px 15px 15px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
     color: #fff;
     font-size: 16px;
@@ -1081,7 +1122,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .main-content-with-sidebar {
     display: flex;
     gap: 40px;
-    max-width: 1400px;
+    max-width: 1420px;
     margin: 0 auto;
     padding: 0 20px;
     align-items: flex-start;
@@ -1348,11 +1389,17 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .medi-recommend-slider-wrapper {
     position: relative;
     overflow: hidden;
+    padding: 0 60px; /* ナビゲーションボタン用のスペース */
+}
+
+.medi-recommend-slider-container {
+    overflow: hidden;
+    margin: 0 -15px;
 }
 
 .medi-recommend-slider {
     display: flex;
-    transition: transform 0.3s ease;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .medi-recommend-slide {
@@ -1364,29 +1411,34 @@ body.admin-bar .site-header-custom.is-fixed-header {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     border: 2px solid #C77DC7;
     color: #C77DC7;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .medi-slider-nav:hover {
-    background: #C77DC7;
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
     color: #fff;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(199, 125, 199, 0.4);
 }
 
 .medi-slider-prev {
-    left: 10px;
+    left: 0;
 }
 
 .medi-slider-next {
-    right: 10px;
+    right: 10;
 }
 
 .medi-recommend-card {
@@ -3015,6 +3067,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
   14. レスポンシブ対応
 ======================================================================== */
 @media (max-width: 1200px) {
+    .medi-recommend-slide {
+        flex: 0 0 33.333%; /* 3つずつ表示 */
+    }
+
    .store-list-container {
        grid-template-columns: repeat(3, 1fr);
    }
@@ -3038,6 +3094,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 @media (max-width: 992px) {
+    .medi-recommend-slide {
+        flex: 0 0 50%; /* 2つずつ表示 */
+    }
+
    .site-footer-custom__nav-widgets {
        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
        gap: 30px;
@@ -3095,6 +3155,19 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 @media (max-width: 768px) {
+    .medi-recommend-slide {
+        flex: 0 0 100%; /* 1つずつ表示 */
+    }
+
+    .medi-recommend-slider-wrapper {
+        padding: 0 40px;
+    }
+    
+    .medi-slider-nav {
+        width: 40px;
+        height: 40px;
+    }
+    
     .medi-hero-section {
         background-attachment: scroll; /* モバイルでは固定背景を無効 */
     }
