@@ -151,12 +151,14 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .footer-category-widget__menu {
     list-style: none;
+    color: #fff;
     padding-left: 0;
     margin: 0;
 }
 
 .footer-category-widget__menu li {
     margin-bottom: 10px;
+    color: #fff;
 }
 
 .footer-category-widget__menu li:last-child {
@@ -224,11 +226,13 @@ body.admin-bar .site-header-custom.is-fixed-header {
 ======================================================================== */
 .medi-hero-section {
     position: relative;
-    min-height: 1080px;    
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    margin-top: -60px; /* ヘッダーの高さ分ネガティブマージン */
+    padding-top: 60px; /* ヘッダーの高さ分パディング */
 }
 
 .medi-hero-video {
@@ -364,13 +368,33 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .medi-hero-section__container {
     height: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end; /* 下寄せ */
     align-items: center;
-    padding: 60px 20px;
+    padding: 60px 20px 0 20px;
     position: relative;
     z-index: 10;
+}
+
+.medi-hero-section__content-bottom {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 80px; /* 下余白 */
+}
+
+.medi-hero-section__search-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.search-form-inner {
+    margin: 0 auto;
 }
 
 /* --- 動的背景効果 --- */
@@ -659,7 +683,9 @@ body.admin-bar .site-header-custom.is-fixed-header {
 /* --- 検索フォーム（下部） --- */
 .medi-hero-section__search-wrapper {
     width: 100%;
-    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
 }
 
 .medi-hero-section__search-container {
@@ -670,7 +696,11 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 .search-form-inner {
-    bbackground: rgba(20, 20, 40, 0.95); /* より濃い背景色 */
+    margin: 0 auto;
+}
+
+.search-form-inner {
+    background: rgba(20, 20, 40, 0.65); /* より濃い背景色 */
     backdrop-filter: blur(30px);
     border-radius: 20px;
     padding: 30px;
@@ -1141,6 +1171,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 .sidebar-sticky {
+    padding-top: 100px;
     display: flex;
     flex-direction: column;
     gap: 25px;
@@ -1617,6 +1648,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    margin-top: 20px;
 }
 
 .medi-region-prefecture-link {
@@ -1861,6 +1893,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* フィルターフォーム */
 .store-search-form {
+    max-width: 1280px;
+    margin: 40px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 16px;
@@ -2604,7 +2638,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* メインコンテンツ */
 .store-content-wrapper {
-   background-color: #f8f9fa;
+   background-color: transparent;
    padding: 0 0 80px 0;
 }
 
@@ -2630,7 +2664,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .store-recommended-photo__image {
    width: 100%;
    height: auto;
-   border-radius: 16px;
+   /* border-radius: 16px; */
    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
    transition: transform 0.3s ease;
 }
@@ -2679,7 +2713,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .store-info-card {
    background: #fff;
-   border-radius: 20px;
+   border-radius: 15px;
    padding: 30px;
    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
    position: sticky;

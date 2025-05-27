@@ -70,61 +70,53 @@ jQuery(document).ready(function($) {
         }
     });
 
-    // --- 地域フィルター機能 ---
-    const $regionButtons = $('.filter-button--region');
-    const $prefectureGroups = $('.filter-region__prefecture-group');
-    const $prefecturesPlaceholder = $('.filter-region__prefectures-placeholder');
-    
-    console.log('[Archive Filters] Region setup - Buttons:', $regionButtons.length, 'Groups:', $prefectureGroups.length);
-    
-    // 地域ボタンクリックイベント
-    $regionButtons.on('click', function() {
-        const regionId = $(this).data('region-id');
-        const $button = $(this);
-        
-        console.log('[Archive Filters] Region clicked:', regionId, 'Text:', $button.text().trim());
-        
-        if ($button.hasClass('is-selected')) {
-            // 選択解除
-            console.log('[Archive Filters] Deselecting region:', regionId);
-            $button.removeClass('is-selected');
-            
-            // 全ての都道府県グループを非表示
-            $prefectureGroups.slideUp(200, function() {
-                $(this).hide().removeClass('active');
-            });
-            
-            $prefecturesPlaceholder.text('地方を選択してください').slideDown(200);
-            
-            // 対応する都道府県選択もクリア
-            const $targetGroup = $(`[data-parent-region-id="${regionId}"]`);
-            $targetGroup.find('input[type="radio"]').prop('checked', false);
-            $targetGroup.find('.filter-button').removeClass('is-selected');
-            
-            console.log('[Archive Filters] Region deselected and prefectures cleared');
-        } else {
-            // 新しい地域選択
-            console.log('[Archive Filters] Selecting new region:', regionId);
-            $regionButtons.removeClass('is-selected');
-            $button.addClass('is-selected');
-            
-            // 全ての都道府県グループを非表示
-            $prefectureGroups.slideUp(200, function() {
-                $(this).hide().removeClass('active');
-            });
-            
-            // 対象の都道府県グループのみ表示
-            const $targetGroup = $(`[data-parent-region-id="${regionId}"]`);
-            if ($targetGroup.length && $targetGroup.find('label').length) {
-                $targetGroup.slideDown(300).addClass('active');
-                $prefecturesPlaceholder.hide();
-                console.log('[Archive Filters] Prefecture group displayed for region:', regionId);
-            } else {
-                $prefecturesPlaceholder.text('この地方の都道府県は登録されていません。').slideDown(200);
-                console.log('[Archive Filters] No prefectures found for region:', regionId);
-            }
-        }
-    });
+ // --- 地域フィルター機能 ---
+ const $regionButtons = $('.filter-button--region');
+ const $prefectureGroups = $('.filter-region__prefecture-group');
+ const $prefecturesPlaceholder = $('.filter-region__prefectures-placeholder');
+ 
+ console.log('[Archive Filters] Region setup - Buttons:', $regionButtons.length, 'Groups:', $prefectureGroups.length);
+ 
+ // 地域ボタンクリックイベント
+ $regionButtons.on('click', function() {
+     const regionId = $(this).data('region-id');
+     const $button = $(this);
+     
+     console.log('[Archive Filters] Region clicked:', regionId, 'Text:', $button.text().trim());
+     
+     // 他の地域ボタンの選択を解除
+     $regionButtons.not($button).removeClass('is-selected');
+     
+     // 全ての都道府県グループを非表示
+     $prefectureGroups.removeClass('active').slideUp(200);
+     
+     if ($button.hasClass('is-selected')) {
+         // 同じ地域を再度クリックした場合は選択解除
+         console.log('[Archive Filters] Deselecting region:', regionId);
+         $button.removeClass('is-selected');
+         $prefecturesPlaceholder.text('地方を選択してください').slideDown(200);
+         
+         // 対応する都道府県選択もクリア
+         const $targetGroup = $(`[data-parent-region-id="${regionId}"]`);
+         $targetGroup.find('input[type="radio"]').prop('checked', false);
+         $targetGroup.find('.filter-button').removeClass('is-selected');
+     } else {
+         // 新しい地域を選択
+         console.log('[Archive Filters] Selecting new region:', regionId);
+         $button.addClass('is-selected');
+         
+         // 対象の都道府県グループのみ表示
+         const $targetGroup = $(`[data-parent-region-id="${regionId}"]`);
+         if ($targetGroup.length && $targetGroup.find('label').length) {
+             $targetGroup.slideDown(300).addClass('active');
+             $prefecturesPlaceholder.hide();
+             console.log('[Archive Filters] Prefecture group displayed for region:', regionId);
+         } else {
+             $prefecturesPlaceholder.text('この地方の都道府県は登録されていません。').slideDown(200);
+             console.log('[Archive Filters] No prefectures found for region:', regionId);
+         }
+     }
+ });
 
     // --- フィルターボタンの選択状態管理（クリーン版） ---
     

@@ -94,9 +94,11 @@ $address_for_map = get_field('store_address', $store_id);
             <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer" 
                class="store-hero__sns-float store-hero__sns-float--<?php echo $sns_key; ?>" 
                title="<?php echo esc_attr($sns_item['alt']); ?>">
+                <span class="sns-float-bg"></span>
                 <img src="<?php echo esc_url($icon_base_path . $sns_item['icon']); ?>" 
                      alt="<?php echo esc_attr($sns_item['alt']); ?>" 
                      class="store-hero__sns-icon">
+                <span class="sns-float-ripple"></span>
             </a>
             <?php
         }

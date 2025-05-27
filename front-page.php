@@ -35,14 +35,13 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
         <div class="bg-particle bg-particle--4"></div>
         <div class="bg-particle bg-particle--5"></div>
     </div>
-            
-            <!-- 光のライン -->
-            <div class="light-lines">
-                <div class="light-line light-line--1"></div>
-                <div class="light-line light-line--2"></div>
-                <div class="light-line light-line--3"></div>
-            </div>
-        </div>
+    
+    <!-- 光のライン -->
+    <div class="light-lines">
+        <div class="light-line light-line--1"></div>
+        <div class="light-line light-line--2"></div>
+        <div class="light-line light-line--3"></div>
+    </div>
         
         <div class="container medi-hero-section__container">
             
@@ -426,7 +425,7 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
             <aside class="homepage-sidebar">
                 <div class="sidebar-sticky">
                     <div class="sidebar-ad-area">
-                        <h3 class="sidebar-title">スポンサー</h3>
+                        <h3 class="sidebar-title">PR</h3>
                         <?php
                         if (function_exists('adinserter')) {
                             echo adinserter(1);
@@ -442,13 +441,13 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                         ?>
                     </div>
                     
-                    <div class="sidebar-ad-area">
+                    <!-- <div class="sidebar-ad-area">
                         <?php
                         if (function_exists('adinserter')) {
                             echo adinserter(3);
                         }
                         ?>
-                    </div>
+                    </div> -->
                 </div>
             </aside>
         </div>
