@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
     }
 
 // =====================================
-// 新着店舗スライダー（改良版）
+// 新着店舗スライダー（強化版）
 // =====================================
 function initRecommendSlider() {
     const $slider = $('#recommendSlider');
@@ -50,6 +50,7 @@ function initRecommendSlider() {
     const totalSlides = $slides.length;
     let slidesPerView = 4;
     let autoSlideInterval;
+    let isTransitioning = false;
     
     // レスポンシブ対応
     function updateSlidesPerView() {
@@ -66,11 +67,17 @@ function initRecommendSlider() {
     }
     
     function updateSlider(animate = true) {
+        if (isTransitioning) return;
+        
         const slideWidth = 100 / slidesPerView;
         const translateX = -(currentIndex * slideWidth);
         
         if (animate) {
+            isTransitioning = true;
             $slider.css('transform', `translateX(${translateX}%)`);
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 600);
         } else {
             $slider.css({
                 'transition': 'none',
@@ -89,6 +96,7 @@ function initRecommendSlider() {
     }
     
     function nextSlide() {
+        if (isTransitioning) return;
         if (currentIndex < totalSlides - slidesPerView) {
             currentIndex++;
         } else {
@@ -98,6 +106,7 @@ function initRecommendSlider() {
     }
     
     function prevSlide() {
+        if (isTransitioning) return;
         if (currentIndex > 0) {
             currentIndex--;
         } else {
@@ -108,9 +117,11 @@ function initRecommendSlider() {
     
     function startAutoSlide() {
         stopAutoSlide();
-        autoSlideInterval = setInterval(() => {
-            nextSlide();
-        }, 4000); // 4秒ごと
+        if (totalSlides > slidesPerView) {
+            autoSlideInterval = setInterval(() => {
+                nextSlide();
+            }, 5000); // 5秒ごと
+        }
     }
     
     function stopAutoSlide() {
@@ -120,43 +131,53 @@ function initRecommendSlider() {
     }
     
     // イベントリスナー
-    $prevBtn.on('click', () => {
+    $prevBtn.on('click', (e) => {
+        e.preventDefault();
         stopAutoSlide();
         prevSlide();
-        startAutoSlide();
+        setTimeout(startAutoSlide, 3000); // 3秒後に自動再生再開
     });
     
-    $nextBtn.on('click', () => {
+    $nextBtn.on('click', (e) => {
+        e.preventDefault();
         stopAutoSlide();
         nextSlide();
-        startAutoSlide();
+        setTimeout(startAutoSlide, 3000); // 3秒後に自動再生再開
     });
     
     // ホバー時は自動スライドを停止
-    $slider.on('mouseenter', stopAutoSlide);
-    $slider.on('mouseleave', startAutoSlide);
+    $slider.closest('.medi-recommend-slider-wrapper').on('mouseenter', stopAutoSlide);
+    $slider.closest('.medi-recommend-slider-wrapper').on('mouseleave', startAutoSlide);
     
     // タッチ操作対応
     let touchStartX = 0;
     let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
     
     $slider.on('touchstart', (e) => {
         touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
         stopAutoSlide();
     });
     
     $slider.on('touchend', (e) => {
         touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
         handleSwipe();
-        startAutoSlide();
+        setTimeout(startAutoSlide, 3000);
     });
     
     function handleSwipe() {
         const swipeThreshold = 50;
-        const diff = touchStartX - touchEndX;
+        const diffX = touchStartX - touchEndX;
+        const diffY = Math.abs(touchStartY - touchEndY);
         
-        if (Math.abs(diff) > swipeThreshold) {
-            if (diff > 0) {
+        // 縦スワイプの場合はスライドしない
+        if (diffY > 100) return;
+        
+        if (Math.abs(diffX) > swipeThreshold) {
+            if (diffX > 0) {
                 nextSlide(); // 左スワイプ
             } else {
                 prevSlide(); // 右スワイプ
@@ -165,10 +186,14 @@ function initRecommendSlider() {
     }
     
     // ウィンドウリサイズ対応
+    let resizeTimeout;
     $(window).on('resize', () => {
-        updateSlidesPerView();
-        currentIndex = Math.min(currentIndex, Math.max(0, totalSlides - slidesPerView));
-        updateSlider(false);
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            updateSlidesPerView();
+            currentIndex = Math.min(currentIndex, Math.max(0, totalSlides - slidesPerView));
+            updateSlider(false);
+        }, 250);
     });
     
     // 初期化

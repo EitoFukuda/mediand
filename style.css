@@ -37,19 +37,19 @@
 
 /* 共通セクションスタイル */
 .medi-section-title {
-    font-size: 36px;
-    font-weight: 700;
-    color: #333;
+    font-size: 32px; /* 48pxから32pxに縮小 */
+    font-weight: 800;
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     position: relative;
+    display: inline-block;
 }
 
 .medi-section-subtitle {
     font-size: 16px;
     color: #6c757d;
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 30px; /* 60pxから30pxに縮小 */
     line-height: 1.6;
 }
 
@@ -73,17 +73,19 @@
 
 .medi-section-header {
     text-align: center;
-    margin-bottom: 80px;
+    margin-bottom: 40px; /* 80pxから40pxに縮小 */
     position: relative;
     z-index: 2;
+    background: transparent; /* 背景を透明に */
 }
 
 .medi-section-title--glow {
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-size: clamp(2rem, 4vw, 3rem); /* サイズ調整 */
     font-weight: 800;
-    margin: 0 0 20px 0;
+    margin: 0 0 12px 0; /* 20pxから12pxに縮小 */
     position: relative;
     display: inline-block;
+    background: transparent; /* 背景を透明に */
 }
 
 .medi-section-title--glow .title-text {
@@ -256,7 +258,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .footer-category-widget__menu {
     list-style: none;
-    color: #fff;
+    color: #fff; /* 既存 */
     padding-left: 0;
     margin: 0;
 }
@@ -271,13 +273,13 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 .footer-category-widget__menu a {
-    color: #adb5bd;
+    color: #fff; /* #adb5bdから#fffに変更 */
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .footer-category-widget__menu a:hover {
-    color: #fff;
+    color: #E8B4E8; /* ホバー時はテーマカラーに変更 */
 }
 
 .site-footer-custom__bottom {
@@ -771,6 +773,15 @@ body.admin-bar .site-header-custom.is-fixed-header {
     gap: 30px;
 }
 
+/* グリッド要素との距離調整 */
+.medi-recommend-grid--enhanced,
+.medi-region-accordion,
+.medi-feeling-grid,
+.medi-situation-grid,
+.medi-genre-grid {
+    margin-top: 20px; /* 上マージンを追加して調整 */
+}
+
 .medi-recommend-card--enhanced {
     background: #fff;
     border-radius: 20px;
@@ -926,10 +937,18 @@ body.admin-bar .site-header-custom.is-fixed-header {
     overflow: hidden;
 }
 
+/* セクション間のマージン調整 */
+.medi-recommend-section + .medi-region-section,
+.medi-region-section + .medi-feeling-section,
+.medi-feeling-section + .medi-situation-section,
+.medi-situation-section + .medi-genre-section {
+    margin-top: -20px; /* セクション間を詰める */
+}
+
 /* 新着店舗セクション */
 .medi-recommend-section {
-    padding: 100px 0;
-    background: #fff;
+    padding: 80px 0; /* パディング調整 */
+    background: transparent; /* 背景を透明に */
 }
 
 .medi-recommend-slider-wrapper {
@@ -1080,8 +1099,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* 地域セクション */
 .medi-region-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+    padding: 80px 0;
+    background: transparent; /* 背景を透明に */
 }
 
 .medi-region-accordion {
@@ -1263,8 +1282,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* シチュエーションセクション */
 .medi-situation-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #fff5f8 0%, #fff 100%);
+    padding: 80px 0;
+    background: transparent; /* 背景を透明に */
 }
 
 .medi-situation-grid {
@@ -1313,30 +1332,44 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .medi-situation-item__overlay {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 60%, rgba(0, 0, 0, 0.3) 80%, transparent 100%); /* より濃いグラデーション */
+    padding: 25px 20px; /* パディング調整 */
     display: flex;
     align-items: flex-end;
-    padding: 30px;
+    min-height: 90px; /* 高さを少し縮小 */
 }
 
 .medi-situation-item__text {
     color: #fff;
-    font-size: 18px;
+    font-size: 18px; /* 20pxから18pxに調整 */
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    background: rgba(0, 0, 0, 0.5);
-    padding: 8px 16px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9); /* より強いシャドウ */
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5); /* より濃い背景 */
+    padding: 10px 16px; /* パディング調整 */
     border-radius: 20px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* ボーダーを追加 */
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 120px; /* 最小幅を設定 */
+}
+
+.medi-situation-item:hover .medi-situation-item__text {
+    background: rgba(232, 180, 232, 0.95); /* ホバー時により不透明に */
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(232, 180, 232, 0.6);
 }
 
 /* ジャンルセクション */
 .medi-genre-section {
-    padding: 100px 0;
-    background: #fff;
+    padding: 80px 0;
+    background: transparent; /* 背景を透明に */
 }
 
 .medi-genre-grid {
@@ -1564,6 +1597,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
     border-top: 2px solid #f1f3f4;
     position: relative;
     display: block;
+    clear: both;
 }
 
 .filter-region__prefectures-wrapper::before {
@@ -1588,6 +1622,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
     border-radius: 12px;
     border: 1px solid rgba(232, 180, 232, 0.2);
     animation: slideDownSmooth 0.4s ease-out;
+    width: 100%; /* 幅を100%に固定 */
+    box-sizing: border-box;
 }
 
 .filter-region__prefecture-group.active {
@@ -1607,6 +1643,15 @@ body.admin-bar .site-header-custom.is-fixed-header {
         max-height: 300px;
         padding: 15px;
     }
+}
+
+/* 地域ボタンのレイアウト調整 */
+.filter-region__regions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 0;
+    width: 100%;
 }
 
 .filter-region__prefectures-placeholder {
@@ -1885,10 +1930,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
     background-repeat: no-repeat;
     color: #fff;
     position: relative;
-    min-height: 400px;
+    min-height: 500px;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end;
+    justify-content: flex-start;
     margin-bottom: 60px;
 }
 
@@ -1898,20 +1943,19 @@ body.admin-bar .site-header-custom.is-fixed-header {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
     z-index: 1;
 }
 
 .store-hero.no-background-image {
     background: linear-gradient(135deg, #E8B4E8, #C77DC7);
-    min-height: 300px;
+    min-height: 400px;
 }
 
 .store-hero__content {
     position: relative;
     z-index: 2;
     width: 100%;
-    text-align: center;
 }
 
 .store-hero__main-info {
@@ -1921,25 +1965,37 @@ body.admin-bar .site-header-custom.is-fixed-header {
     gap: 15px;
 }
 
+.store-hero__main-info--bottom-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 40px 0;
+    text-align: left;
+}
+
 .store-hero__name {
-    font-size: 42px;
-    font-weight: bold;
+    font-size: 48px;
+    font-weight: 800;
     margin: 0;
     line-height: 1.2;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 3px 3px 10px rgba(0,0,0,0.7);
+    letter-spacing: -0.5px;
 }
 
 .store-hero__location {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 18px;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 500;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
 }
 
 .store-hero__location-icon {
-    width: 20px;
-    height: 20px;
-    filter: brightness(0) invert(1);
+    width: 24px;
+   height: 24px;
+   filter: brightness(0) invert(1);
 }
 
 /* SNSボタン */
@@ -1975,47 +2031,47 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* SNS強化版 */
 .store-hero__social--enhanced {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
-    gap: 15px;
-    justify-content: center;
+    gap: 20px;
     align-items: center;
 }
 
 .store-hero__social-link--enhanced {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    cursor: pointer;
-    overflow: hidden;
-    transform-style: preserve-3d;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: 60px;
+   height: 60px;
+   border-radius: 50%;
+   transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+   cursor: pointer;
+   overflow: hidden;
+   transform-style: preserve-3d;
+   text-decoration: none;
 }
 
 .social-link-bg {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 50%;
-    transition: all 0.4s ease;
-    z-index: 1;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(255, 255, 255, 0.9);
+   border-radius: 50%;
+   transition: all 0.5s ease;
+   z-index: 1;
+   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+   backdrop-filter: blur(10px);
 }
 
 .store-hero__social-link--enhanced .store-hero__social-icon {
-    width: 24px;
-    height: 24px;
-    position: relative;
-    z-index: 3;
-    transition: all 0.4s ease;
-    filter: brightness(0) saturate(100%);
+    width: 28px;
+   height: 28px;
+   position: relative;
+   z-index: 3;
+   transition: all 0.5s ease;
 }
 
 .social-link-ripple {
@@ -2024,22 +2080,146 @@ body.admin-bar .site-header-custom.is-fixed-header {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(232, 180, 232, 0.3);
+    background: rgba(232, 180, 232, 0.4);
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    transition: all 0.6s ease;
+    transition: all 0.8s ease;
     z-index: 2;
+ }
+ 
+ /* ホバーアニメーション */
+ .store-hero__social-link--enhanced:hover {
+    transform: translateY(-8px) scale(1.15) rotateY(10deg);
+    animation: social-bounce-enhanced 0.8s ease-out;
+ }
+ 
+ .store-hero__social-link--enhanced:hover .social-link-bg {
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7, #BA55D3);
+    box-shadow: 0 15px 40px rgba(199, 125, 199, 0.5);
+    transform: scale(1.1) rotateZ(5deg);
+ }
+ 
+ .store-hero__social-link--enhanced:hover .store-hero__social-icon {
+    filter: brightness(0) saturate(100%) invert(1);
+    transform: scale(1.3) rotateZ(-5deg);
+ }
+ 
+ .store-hero__social-link--enhanced:hover .social-link-ripple {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+ }
+ 
+ .store-hero__social-link--enhanced:active {
+    transform: translateY(-5px) scale(1.05);
+ }
+ 
+ /* 個別SNSカラー対応（強化版） */
+ .store-hero__social-link--enhanced[data-sns="instagram"]:hover .social-link-bg {
+    background: radial-gradient(circle, #E4405F, #C13584, #833AB4, #405DE6);
+    box-shadow: 0 15px 40px rgba(228, 64, 95, 0.6);
+ }
+ 
+ .store-hero__social-link--enhanced[data-sns="facebook"]:hover .social-link-bg {
+    background: linear-gradient(135deg, #1877F2, #42A5F5, #1565C0);
+    box-shadow: 0 15px 40px rgba(24, 119, 242, 0.6);
+ }
+ 
+ .store-hero__social-link--enhanced[data-sns="x"]:hover .social-link-bg {
+    background: linear-gradient(135deg, #000000, #1DA1F2, #0D8BD9);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+ }
+ 
+ .store-hero__social-link--enhanced[data-sns="tiktok"]:hover .social-link-bg {
+    background: linear-gradient(135deg, #FF0050, #000000, #FF0050);
+    box-shadow: 0 15px 40px rgba(255, 0, 80, 0.6);
+ }
+ 
+ @keyframes social-bounce-enhanced {
+    0% { transform: translateY(-8px) scale(1.15) rotateY(10deg); }
+    25% { transform: translateY(-12px) scale(1.2) rotateY(15deg); }
+    50% { transform: translateY(-6px) scale(1.1) rotateY(8deg); }
+    75% { transform: translateY(-10px) scale(1.18) rotateY(12deg); }
+    100% { transform: translateY(-8px) scale(1.15) rotateY(10deg); }
+ }
+ 
+ /* 3Dエフェクト追加 */
+ .store-hero__social-link--enhanced::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, transparent, rgba(232, 180, 232, 0.3), transparent);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+ }
+ 
+ .store-hero__social-link--enhanced:hover::before {
+    opacity: 1;
+    animation: rotate-border 2s linear infinite;
+ }
+ 
+ @keyframes rotate-border {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+ }
+ 
+ /* 連続アニメーション効果 */
+ .store-hero__social-link--enhanced {
+    animation: social-pulse-subtle 3s ease-in-out infinite;
+ }
+ 
+ .store-hero__social-link--enhanced:nth-child(1) {
+    animation-delay: 0.2s;
+ }
+ 
+ .store-hero__social-link--enhanced:nth-child(2) {
+    animation-delay: 0.6s;
+ }
+ 
+ .store-hero__social-link--enhanced:nth-child(3) {
+    animation-delay: 1s;
+ }
+ 
+ .store-hero__social-link--enhanced:nth-child(4) {
+    animation-delay: 1.4s;
+ }
+ 
+ @keyframes social-pulse-subtle {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(232, 180, 232, 0.3);
+    }
+    50% { 
+        box-shadow: 0 0 0 15px rgba(232, 180, 232, 0);
+    }
+}
+
+/* .social-link-ripple {
+    position: absolute;
+   top: 50%;
+   left: 50%;
+   width: 0;
+   height: 0;
+   background: rgba(232, 180, 232, 0.4);
+   border-radius: 50%;
+   transform: translate(-50%, -50%);
+   transition: all 0.8s ease;
+   z-index: 2;
 }
 
 .store-hero__social-link--enhanced:hover {
-    transform: translateY(-5px) scale(1.1);
-    animation: social-bounce 0.6s ease-out;
+    transform: translateY(-8px) scale(1.15) rotateY(10deg);
+   animation: social-bounce-enhanced 0.8s ease-out;
 }
 
 .store-hero__social-link--enhanced:hover .social-link-bg {
-    background: linear-gradient(135deg, #E8B4E8, #C77DC7);
-    box-shadow: 0 8px 25px rgba(199, 125, 199, 0.4);
-    transform: scale(1.1);
+    background: linear-gradient(135deg, #E8B4E8, #C77DC7, #BA55D3);
+   box-shadow: 0 15px 40px rgba(199, 125, 199, 0.5);
+   transform: scale(1.1) rotateZ(5deg);
 }
 
 .store-hero__social-link--enhanced:hover .store-hero__social-icon {
@@ -2055,10 +2235,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .store-hero__social-link--enhanced:active {
     transform: translateY(-3px) scale(1.05);
-}
+} */
 
 /* 個別SNSカラー対応 */
-.store-hero__social-link--enhanced[title*="Instagram"]:hover .social-link-bg {
+/* .store-hero__social-link--enhanced[title*="Instagram"]:hover .social-link-bg {
     background: linear-gradient(135deg, #E4405F, #C13584, #833AB4);
 }
 
@@ -2109,7 +2289,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
     50% { 
         box-shadow: 0 0 0 10px rgba(232, 180, 232, 0);
     }
-}
+} */
 
 /* メインコンテンツ */
 .store-content-wrapper {
@@ -2632,6 +2812,15 @@ body.admin-bar .site-header-custom.is-fixed-header {
     overflow: hidden;
 }
 
+/* containerの背景も透明化 */
+.medi-recommend-section .container,
+.medi-genre-section .container,
+.medi-region-section .container,
+.medi-situation-section .container {
+    background: transparent;
+    box-shadow: none;
+}
+
 .medi-recommend-section .bg-decorations-container,
 .medi-region-section .bg-decorations-container,
 .medi-feeling-section .bg-decorations-container,
@@ -2763,7 +2952,9 @@ body.admin-bar .site-header-custom.is-fixed-header {
     }
 
     .medi-section--enhanced {
-        padding: 80px 0;
+    padding: 60px 0; /* 100pxから60pxに縮小 */
+    position: relative;
+    overflow: hidden;
     }
 }
 
@@ -2785,9 +2976,36 @@ body.admin-bar .site-header-custom.is-fixed-header {
         width: 40px;
         height: 40px;
     }
+
+    .medi-section-subtitle {
+        margin-bottom: 20px; /* モバイルで更に縮小 */
+    }
+
+    .store-hero__name {
+        font-size: 32px;
+    }
     
     .medi-hero-section {
         background-attachment: scroll;
+    }
+
+    .store-hero__location {
+        font-size: 16px;
+    }
+    
+    .store-hero__social--enhanced {
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .store-hero__social-link--enhanced {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .store-hero__social-link--enhanced .store-hero__social-icon {
+        width: 24px;
+        height: 24px;
     }
 
     .search-form-row {
@@ -2865,15 +3083,19 @@ body.admin-bar .site-header-custom.is-fixed-header {
     }
 
     .medi-section-title {
-        font-size: 28px;
+        font-size: 24px;
     }
     
+    .medi-section--enhanced {
+        padding: 40px 0; /* モバイルでさらに縮小 */
+    }
+
     .medi-recommend-section,
     .medi-region-section,
     .medi-feeling-section,
     .medi-situation-section,
     .medi-genre-section {
-        padding: 60px 0;
+     padding: 40px 0; /* 80pxから60pxに縮小 */
     }
 
     .bg-decoration-circle {
@@ -2915,10 +3137,53 @@ body.admin-bar .site-header-custom.is-fixed-header {
     .sidebar-ad-area {
         flex: none;
     }
+
+    .filter-region__prefecture-group {
+        padding: 12px;
+        gap: 8px;
+    }
+    
+    .filter-region__regions {
+        gap: 8px;
+    }
 }
 
 /* スマートフォン・小型モバイル (480px以下) */
 @media (max-width: 480px) {
+    .store-hero__name {
+        font-size: 28px;
+    }
+    
+    .store-hero__location {
+        font-size: 14px;
+    }
+
+    .medi-section--enhanced {
+        padding: 30px 0; /* 小型モバイルで最小に */
+    }
+    
+    .medi-recommend-section,
+    .medi-region-section,
+    .medi-feeling-section,
+    .medi-situation-section,
+    .medi-genre-section {
+        padding: 30px 0; /* 小型モバイルで最小に */
+    }
+
+    .store-hero__social--enhanced {
+        gap: 12px;
+    }
+    
+    .store-hero__social-link--enhanced {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .store-hero__social-link--enhanced .store-hero__social-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
     .medi-section-title {
         font-size: 24px;
     }

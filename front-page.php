@@ -54,35 +54,82 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                         <div class="search-form-inner">
                             <div class="search-form-row">
                                 <!-- 都道府県セレクト -->
-                                <div class="search-form-field">
-                                    <label class="search-form-label">エリア</label>
-                                    <div class="custom-select-wrapper">
-                                        <select name="prefecture_filter" class="custom-select" id="prefecture-select">
-                                            <option value="">都道府県を選択</option>
-                                            <?php
-                                            $prefectures = get_terms(array(
-                                                'taxonomy' => 'prefecture',
-                                                'hide_empty' => false,
-                                                'parent' => !0, // 親タームを除外（都道府県のみ）
-                                                'orderby' => 'name',
-                                                'order' => 'ASC'
-                                            ));
-                                            if (!is_wp_error($prefectures) && !empty($prefectures)) :
-                                                foreach($prefectures as $pref) :
-                                            ?>
-                                                <option value="<?php echo esc_attr($pref->slug); ?>"><?php echo esc_html($pref->name); ?></option>
-                                            <?php 
-                                                endforeach;
-                                            endif;
-                                            ?>
-                                        </select>
-                                        <div class="select-arrow">
-                                            <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                                                <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
+<div class="search-form-field">
+    <label class="search-form-label">エリア</label>
+    <div class="custom-select-wrapper">
+        <select name="prefecture_filter" class="custom-select" id="prefecture-select">
+            <option value="">都道府県を選択</option>
+            <?php
+            // 地方の順序を定義
+            $region_order = array(
+                '北海道/東北', '関東', '中部', '近畿', '関西', '中国', '四国', '九州', '沖縄'
+            );
+            
+            // 地方（親ターム）を取得
+            $region_terms = get_terms(array(
+                'taxonomy' => 'prefecture',
+                'hide_empty' => false,
+                'parent' => 0, // 親タームのみ
+                'orderby' => 'name',
+                'order' => 'ASC'
+            ));
+            
+            if (!is_wp_error($region_terms) && !empty($region_terms)) :
+                // 地方を指定した順序でソート
+                $ordered_regions = array();
+                foreach($region_order as $region_name) {
+                    foreach($region_terms as $term) {
+                        if($term->name === $region_name || strpos($term->name, $region_name) !== false) {
+                            $ordered_regions[] = $term;
+                            break;
+                        }
+                    }
+                }
+                
+                // 順序にない地方を末尾に追加
+                foreach($region_terms as $term) {
+                    $found = false;
+                    foreach($ordered_regions as $ordered) {
+                        if($ordered->term_id === $term->term_id) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                    if(!$found) {
+                        $ordered_regions[] = $term;
+                    }
+                }
+                
+                // 各地方の都道府県を表示
+                foreach($ordered_regions as $region) :
+                    $prefectures = get_terms(array(
+                        'taxonomy' => 'prefecture',
+                        'hide_empty' => false,
+                        'parent' => $region->term_id,
+                        'orderby' => 'name',
+                        'order' => 'ASC'
+                    ));
+                    
+                    if (!is_wp_error($prefectures) && !empty($prefectures)) :
+            ?>
+                        <optgroup label="<?php echo esc_attr($region->name); ?>">
+                            <?php foreach($prefectures as $pref) : ?>
+                                <option value="<?php echo esc_attr($pref->slug); ?>"><?php echo esc_html($pref->name); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+            <?php 
+                    endif;
+                endforeach;
+            endif;
+            ?>
+        </select>
+        <div class="select-arrow">
+            <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
+</div>
                                 
                                 <!-- ジャンルセレクト -->
                                 <div class="search-form-field">
@@ -164,103 +211,121 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
         <div class="main-content-with-sidebar">
             <div class="main-content-area">
         
-                <?php // --- 新着店舗セクション（近未来デザイン） --- ?>
-                <section class="medi-recommend-section medi-section--enhanced">
-                    <div class="container">
-                        <div class="medi-section-header">
-                            <h2 class="medi-section-title medi-section-title--glow">
-                                <span class="title-text">新着店舗</span>
-                                <span class="title-decoration"></span>
-                            </h2>
-                            <p class="medi-section-subtitle">最新の登録店舗をご紹介！話題のスポットをいち早くチェック</p>
-                        </div>
-                        
-                        <div class="medi-recommend-grid medi-recommend-grid--enhanced">
-                            <?php
-                            $recommend_query = new WP_Query(array(
-                                'post_type' => 'store',
-                                'posts_per_page' => 6,
-                                'orderby' => 'date',
-                                'order' => 'DESC'
-                            ));
+            <?php // --- 新着店舗セクション（カルーセルスライダー版） --- ?>
+<section class="medi-recommend-section medi-section--enhanced">
+    <div class="container">
+        <div class="medi-section-header">
+            <h2 class="medi-section-title medi-section-title--glow">
+                <span class="title-text">新着店舗</span>
+                <span class="title-decoration"></span>
+            </h2>
+            <p class="medi-section-subtitle">最新の登録店舗をご紹介！話題のスポットをいち早くチェック</p>
+        </div>
+        
+        <div class="medi-recommend-slider-wrapper">
+            <button type="button" class="medi-slider-nav medi-slider-prev" id="recommendPrev" aria-label="前へ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            
+            <div class="medi-recommend-slider-container">
+                <div class="medi-recommend-slider" id="recommendSlider">
+                    <?php
+                    $recommend_query = new WP_Query(array(
+                        'post_type' => 'store',
+                        'posts_per_page' => 10, // 10店舗に変更
+                        'orderby' => 'date',
+                        'order' => 'DESC'
+                    ));
+                    
+                    if ($recommend_query->have_posts()) :
+                        while ($recommend_query->have_posts()) : $recommend_query->the_post();
+                            $store_id = get_the_ID();
+                            $store_title = get_the_title();
+                            $store_permalink = get_permalink();
+                            $store_thumbnail = get_the_post_thumbnail_url($store_id, 'medium');
                             
-                            if ($recommend_query->have_posts()) :
-                                while ($recommend_query->have_posts()) : $recommend_query->the_post();
-                                    $store_id = get_the_ID();
-                                    $store_title = get_the_title();
-                                    $store_permalink = get_permalink();
-                                    $store_thumbnail = get_the_post_thumbnail_url($store_id, 'medium');
-                                    
-                                    // 都道府県取得
-                                    $prefecture_terms = get_the_terms($store_id, 'prefecture');
-                                    $prefecture_display = '';
-                                    if (!empty($prefecture_terms) && !is_wp_error($prefecture_terms)) {
-                                        $pref_names = [];
-                                        foreach($prefecture_terms as $term) {
-                                            if($term->parent != 0) {
-                                                $pref_names[] = esc_html($term->name);
-                                            }
-                                        }
-                                        $prefecture_display = implode(', ', $pref_names);
+                            // 都道府県取得
+                            $prefecture_terms = get_the_terms($store_id, 'prefecture');
+                            $prefecture_display = '';
+                            if (!empty($prefecture_terms) && !is_wp_error($prefecture_terms)) {
+                                $pref_names = [];
+                                foreach($prefecture_terms as $term) {
+                                    if($term->parent != 0) {
+                                        $pref_names[] = esc_html($term->name);
                                     }
-                                    
-                                    $genre_terms = get_the_terms($store_id, 'genre');
-                            ?>
-                                    <article class="medi-recommend-card medi-recommend-card--enhanced">
-                                        <a href="<?php echo esc_url($store_permalink); ?>" class="medi-recommend-card__link">
-                                            <div class="medi-recommend-card__image-wrapper">
-                                                <div class="medi-recommend-card__image">
-                                                    <?php if ($store_thumbnail) : ?>
-                                                        <img src="<?php echo esc_url($store_thumbnail); ?>" alt="<?php echo esc_attr($store_title); ?>">
-                                                    <?php else : ?>
-                                                        <div class="medi-recommend-card__no-image">
-                                                            <div class="no-image-icon">
-                                                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                                                    <rect x="8" y="8" width="32" height="24" rx="2" stroke="currentColor" stroke-width="2"/>
-                                                                    <circle cx="16" cy="18" r="3" stroke="currentColor" stroke-width="2"/>
-                                                                    <path d="M28 25L32 21L40 29V32H8V25L12 21L16 25" stroke="currentColor" stroke-width="2"/>
-                                                                </svg>
-                                                            </div>
+                                }
+                                $prefecture_display = implode(', ', $pref_names);
+                            }
+                            
+                            $genre_terms = get_the_terms($store_id, 'genre');
+                    ?>
+                            <div class="medi-recommend-slide">
+                                <article class="medi-recommend-card medi-recommend-card--enhanced">
+                                    <a href="<?php echo esc_url($store_permalink); ?>" class="medi-recommend-card__link">
+                                        <div class="medi-recommend-card__image-wrapper">
+                                            <div class="medi-recommend-card__image">
+                                                <?php if ($store_thumbnail) : ?>
+                                                    <img src="<?php echo esc_url($store_thumbnail); ?>" alt="<?php echo esc_attr($store_title); ?>">
+                                                <?php else : ?>
+                                                    <div class="medi-recommend-card__no-image">
+                                                        <div class="no-image-icon">
+                                                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                                                <rect x="8" y="8" width="32" height="24" rx="2" stroke="currentColor" stroke-width="2"/>
+                                                                <circle cx="16" cy="18" r="3" stroke="currentColor" stroke-width="2"/>
+                                                                <path d="M28 25L32 21L40 29V32H8V25L12 21L16 25" stroke="currentColor" stroke-width="2"/>
+                                                            </svg>
                                                         </div>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="card-glow-effect"></div>
-                                            </div>
-                                            
-                                            <div class="medi-recommend-card__content">
-                                                <h3 class="medi-recommend-card__title"><?php echo esc_html($store_title); ?></h3>
-                                                
-                                                <?php if ($prefecture_display) : ?>
-                                                    <p class="medi-recommend-card__location">
-                                                        <span class="location-icon">📍</span>
-                                                        <?php echo $prefecture_display; ?>
-                                                    </p>
-                                                <?php endif; ?>
-                                                
-                                                <?php if ($genre_terms && !is_wp_error($genre_terms)) : ?>
-                                                    <div class="medi-recommend-card__tags">
-                                                        <?php foreach(array_slice($genre_terms, 0, 2) as $term) : ?>
-                                                            <span class="tag tag--glow"><?php echo esc_html($term->name); ?></span>
-                                                        <?php endforeach; ?>
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
-                                        </a>
-                                    </article>
-                            <?php 
-                                endwhile; 
-                                wp_reset_postdata();
-                            else :
-                            ?>
-                                <div class="no-content-message">
-                                    <p>まだ店舗が登録されていません。</p>
-                                </div>
-                            <?php
-                            endif;
-                            ?>
+                                            <div class="card-glow-effect"></div>
+                                        </div>
+                                        
+                                        <div class="medi-recommend-card__content">
+                                            <h3 class="medi-recommend-card__title"><?php echo esc_html($store_title); ?></h3>
+                                            
+                                            <?php if ($prefecture_display) : ?>
+                                                <p class="medi-recommend-card__location">
+                                                    <span class="location-icon">📍</span>
+                                                    <?php echo $prefecture_display; ?>
+                                                </p>
+                                            <?php endif; ?>
+                                            
+                                            <?php if ($genre_terms && !is_wp_error($genre_terms)) : ?>
+                                                <div class="medi-recommend-card__tags">
+                                                    <?php foreach(array_slice($genre_terms, 0, 2) as $term) : ?>
+                                                        <span class="tag tag--glow"><?php echo esc_html($term->name); ?></span>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </a>
+                                </article>
+                            </div>
+                    <?php 
+                        endwhile; 
+                        wp_reset_postdata();
+                    else :
+                    ?>
+                        <div class="no-content-message">
+                            <p>まだ店舗が登録されていません。</p>
                         </div>
-                    </div>
-                </section>
+                    <?php
+                    endif;
+                    ?>
+                </div>
+            </div>
+            
+            <button type="button" class="medi-slider-nav medi-slider-next" id="recommendNext" aria-label="次へ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>
 
                 <?php // --- 地域から選ぶセクション --- ?>
                 <section class="medi-region-section medi-section--enhanced">
@@ -356,11 +421,55 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                 </section>
 
                 <?php // --- その他のセクション（ココロで選ぶ、シチュエーション、ジャンル）--- ?>
+                <section class="medi-situation-section medi-section--enhanced">
+    <div class="container">
+        <div class="medi-section-header">
+            <h2 class="medi-section-title medi-section-title--glow">
+                <span class="title-text">シチュエーションで選ぶ</span>
+                <span class="title-decoration"></span>
+            </h2>
+            <p class="medi-section-subtitle">大切な人との時間や、特別な日にぴったりのお店を見つけましょう。</p>
+        </div>
+        
+        <div class="medi-situation-grid medi-grid--enhanced">
+            <?php 
+            $situation_terms = get_terms(array(
+                'taxonomy' => 'situation',
+                'hide_empty' => false,
+                'orderby' => 'name',
+                'order' => 'ASC'
+            ));
+            
+            if (!empty($situation_terms) && !is_wp_error($situation_terms)) : 
+                foreach ($situation_terms as $term) : 
+            ?>
+                    <a href="<?php echo esc_url(get_post_type_archive_link('store') . '?situation_filter[]=' . $term->slug . '&active_tab=situation'); ?>" class="medi-situation-item medi-item--enhanced">
+                        <div class="medi-situation-item__image">
+                            <?php 
+                            $image = get_field('situation_image', 'situation_' . $term->term_id);
+                            if ($image && is_array($image) && isset($image['url'])) : ?>
+                                <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($term->name); ?>">
+                            <?php else : ?>
+                                <div class="default-situation-bg"></div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="medi-situation-item__overlay">
+                            <span class="medi-situation-item__text"><?php echo esc_html($term->name); ?></span>
+                        </div>
+                    </a>
+            <?php 
+                endforeach; 
+            else : 
+            ?>
+                <p class="no-terms-message">シチュエーション項目が登録されていません。</p>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
                 <?php
                 // 残りのセクションも同様に近未来デザインを適用
                 $sections = [
-                    'feeling' => ['title' => 'ココロで選ぶ', 'subtitle' => 'あなたの気持ちに寄り添う、特別な体験を見つけよう。'],
-                    'situation' => ['title' => 'シチュエーションで選ぶ', 'subtitle' => '大切な人との時間や、特別な日にぴったりのお店を見つけましょう。'], 
+                    'feeling' => ['title' => 'ココロで選ぶ', 'subtitle' => 'あなたの気持ちに寄り添う、特別な体験を見つけよう。'],               
                     'genre' => ['title' => 'ジャンルで選ぶ', 'subtitle' => 'カフェから本格ディナーまで、様々なジャンルのお店をご紹介']
                 ];
                 
@@ -396,17 +505,6 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                                                         <div class="default-feeling-icon">💝</div>
                                                     <?php endif; ?>
                                                 </div>
-                                            <?php elseif ($section_key == 'situation') : ?>
-                                                <div class="medi-situation-item__image">
-                                                    <?php 
-                                                    $image = get_field('situation_image', $section_key . '_' . $term->term_id);
-                                                    if ($image && is_array($image) && isset($image['url'])) : ?>
-                                                        <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($term->name); ?>">
-                                                    <?php else : ?>
-                                                        <div class="default-situation-bg"></div>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="medi-situation-item__overlay"></div>
                                             <?php endif; ?>
                                             <span class="medi-<?php echo $section_key; ?>-item__text"><?php echo esc_html($term->name); ?></span>
                                         </a>

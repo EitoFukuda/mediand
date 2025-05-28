@@ -69,36 +69,69 @@ $icon_base_path = get_stylesheet_directory_uri() . '/assets/icons/';
 
             <div class="store-search-filter-panels">
                 <div id="filter-region" class="store-search-filter-panel <?php if($active_tab_param === 'region') echo 'is-active'; ?>">
-                    <div class="filter-region__regions">
-                        <?php if (!empty($region_terms) && !is_wp_error($region_terms)) : ?>
-                            <?php foreach ($region_terms as $region_term) : ?>
-                                <button type="button" class="filter-button filter-button--region" data-region-id="<?php echo esc_attr($region_term->term_id); ?>" data-region-slug="<?php echo esc_attr($region_term->slug); ?>">
-                                    <?php echo esc_html($region_term->name); ?>
-                                </button>
-                            <?php endforeach; ?>
-                        <?php else: ?><p>地方が登録されていません。</p><?php endif; ?>
-                    </div>
-                    <div class="filter-region__prefectures-wrapper">
-                        <div class="filter-region__prefectures-placeholder">地方を選択してください</div>
-                        <?php
-                        if (!empty($region_terms) && !is_wp_error($region_terms)) {
-                            foreach ($region_terms as $region_term) {
-                                echo '<div class="filter-region__prefecture-group" data-parent-region-id="' . esc_attr($region_term->term_id) . '" style="display:none;">';
-                                $prefs_in_region = get_terms(array('taxonomy' => 'prefecture', 'parent' => $region_term->term_id, 'hide_empty' => false, 'orderby' => 'name', 'order' => 'ASC'));
-                                if (!empty($prefs_in_region) && !is_wp_error($prefs_in_region)) {
-                                    foreach ($prefs_in_region as $pref_term) {
-                                        $is_pref_selected = ($selected_prefecture_slug === $pref_term->slug);
-                                        echo '<label class="filter-button filter-button--radio ' . ($is_pref_selected ? 'is-selected' : '') . '">';
-                                        echo '<input type="radio" name="prefecture_filter" value="' . esc_attr($pref_term->slug) . '" ' . checked($is_pref_selected, true, false) . '>';
-                                        echo esc_html($pref_term->name);
-                                        echo '</label>';
-                                    }
-                                } else { echo '<p class="no-prefs-message">この地方の都道府県は登録されていません。</p>';}
-                                echo '</div>';
-                            }
-                        }
-                        ?>
-                    </div>
+                <div class="filter-region__regions">
+    <?php 
+    // 地方の順序を定義（トップページと同じ）
+    $region_order = array(
+        '北海道/東北', '関東', '中部', '近畿', '関西', '中国', '四国', '九州', '沖縄'
+    );
+    
+    if (!empty($region_terms) && !is_wp_error($region_terms)) :
+        // 順序通りに並び替え
+        $ordered_regions = array();
+        foreach($region_order as $region_name) {
+            foreach($region_terms as $term) {
+                if($term->name === $region_name || strpos($term->name, $region_name) !== false) {
+                    $ordered_regions[] = $term;
+                    break;
+                }
+            }
+        }
+        
+        // 順序にない地方を末尾に追加
+        foreach($region_terms as $term) {
+            $found = false;
+            foreach($ordered_regions as $ordered) {
+                if($ordered->term_id === $term->term_id) {
+                    $found = true;
+                    break;
+                }
+            }
+            if(!$found) {
+                $ordered_regions[] = $term;
+            }
+        }
+        
+        foreach ($ordered_regions as $region_term) : ?>
+            <button type="button" class="filter-button filter-button--region" data-region-id="<?php echo esc_attr($region_term->term_id); ?>" data-region-slug="<?php echo esc_attr($region_term->slug); ?>">
+                <?php echo esc_html($region_term->name); ?>
+            </button>
+        <?php endforeach; 
+    else: ?>
+        <p>地方が登録されていません。</p>
+    <?php endif; ?>
+</div>
+<div class="filter-region__prefectures-wrapper">
+    <div class="filter-region__prefectures-placeholder">地方を選択してください</div>
+    <?php
+    if (!empty($ordered_regions)) {
+        foreach ($ordered_regions as $region_term) {
+            echo '<div class="filter-region__prefecture-group" data-parent-region-id="' . esc_attr($region_term->term_id) . '" style="display:none;">';
+            $prefs_in_region = get_terms(array('taxonomy' => 'prefecture', 'parent' => $region_term->term_id, 'hide_empty' => false, 'orderby' => 'name', 'order' => 'ASC'));
+            if (!empty($prefs_in_region) && !is_wp_error($prefs_in_region)) {
+                foreach ($prefs_in_region as $pref_term) {
+                    $is_pref_selected = ($selected_prefecture_slug === $pref_term->slug);
+                    echo '<label class="filter-button filter-button--radio ' . ($is_pref_selected ? 'is-selected' : '') . '">';
+                    echo '<input type="radio" name="prefecture_filter" value="' . esc_attr($pref_term->slug) . '" ' . checked($is_pref_selected, true, false) . '>';
+                    echo esc_html($pref_term->name);
+                    echo '</label>';
+                }
+            } else { echo '<p class="no-prefs-message">この地方の都道府県は登録されていません。</p>';}
+            echo '</div>';
+        }
+    }
+    ?>
+</div>
                 </div>
 
                 <div id="filter-feeling" class="store-search-filter-panel <?php if($active_tab_param === 'feeling') echo 'is-active'; ?>">
