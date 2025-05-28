@@ -578,4 +578,13 @@ function medi_admin_styles() {
     </style>';
 }
 add_action('admin_head', 'medi_admin_styles');
+
+// 既存のmedi_gensen_child_enqueue_assets関数内に追加
+wp_enqueue_script(
+    'mobile-menu',
+    get_stylesheet_directory_uri() . '/js/mobile-menu.js',
+    array('jquery'),
+    wp_get_theme()->get('Version'),
+    true
+);
 ?>

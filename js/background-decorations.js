@@ -10,9 +10,9 @@
     const config = {
         // 丸の数
         circleCount: {
-            desktop: 15,
-            tablet: 10,
-            mobile: 6
+            desktop: 25,  // 15から25に増加
+            tablet: 18,   // 10から18に増加
+            mobile: 12    // 6から12に増加
         },
         // 色のパレット（コンセプトカラー）
         colors: [
@@ -26,13 +26,13 @@
         
         // サイズ範囲
         sizeRange: {
-            min: 40,
-            max: 200
+            min: 30,
+            max: 300
         },
         // アニメーション速度範囲（秒）
         animationSpeed: {
-            min: 20,
-            max: 50
+            min: 12,
+            max: 35
         },
         // Z-index
         zIndex: -1
@@ -515,16 +515,16 @@ if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').m
         generateFloatKeyframes() {
             const points = [
                 { percent: 0, x: 0, y: 0, scale: 1 },
-                { percent: 25, x: this.randomBetween(-30, 30), y: this.randomBetween(-20, 20), scale: this.randomBetween(0.8, 1.2) },
-                { percent: 50, x: this.randomBetween(-20, 20), y: this.randomBetween(-30, 30), scale: this.randomBetween(0.9, 1.1) },
-                { percent: 75, x: this.randomBetween(-25, 25), y: this.randomBetween(-15, 15), scale: this.randomBetween(0.85, 1.15) },
+                { percent: 25, x: this.randomBetween(-60, 60), y: this.randomBetween(-40, 40), scale: this.randomBetween(0.6, 1.4) },  // 動きを倍に
+                { percent: 50, x: this.randomBetween(-40, 40), y: this.randomBetween(-60, 60), scale: this.randomBetween(0.7, 1.3) },
+                { percent: 75, x: this.randomBetween(-50, 50), y: this.randomBetween(-30, 30), scale: this.randomBetween(0.65, 1.35) },
                 { percent: 100, x: 0, y: 0, scale: 1 }
             ];
-
+        
             return points.map(point => 
                 `${point.percent}% {
-                    transform: translate(calc(-50% + ${point.x}px), calc(-50% + ${point.y}px)) scale(${point.scale});
-                }`
+                    transform: translate(calc(-50% + ${point.x}px), calc(-50% + ${point.y}px)) scale(${point.scale}) rotate(${point.x * 0.3}deg);
+                }`  // 回転も追加
             ).join('\n');
         }
 

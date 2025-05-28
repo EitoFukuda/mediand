@@ -419,3 +419,31 @@ function initialize() {
         `)
         .appendTo('head');
 });
+
+// 階層セレクト機能を追加
+function initHierarchicalSelect() {
+    $('#prefecture-select').on('change', function() {
+        const regionId = $(this).find(':selected').data('region-id');
+        const $subSelect = $('#prefecture-sub-select');
+        
+        if (regionId) {
+            // Ajax で子要素を取得
+            $.post(ajaxurl, {
+                action: 'get_prefecture_children',
+                region_id: regionId
+            }, function(response) {
+                if (response.success) {
+                    $subSelect.html('<option value="">都道府県を選択</option>');
+                    $.each(response.data, function(i, item) {
+                        $subSelect.append(`<option value="${item.slug}">${item.name}</option>`);
+                    });
+                    $subSelect.show();
+                    $(this).hide();
+                }
+            });
+        }
+    });
+}
+
+// initialize関数内に追加
+initHierarchicalSelect();

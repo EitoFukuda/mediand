@@ -54,75 +54,32 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                         <div class="search-form-inner">
                             <div class="search-form-row">
                                 <!-- 都道府県セレクト -->
+<!-- 都道府県セレクト（階層対応版） -->
 <div class="search-form-field">
     <label class="search-form-label">エリア</label>
-    <div class="custom-select-wrapper">
-        <select name="prefecture_filter" class="custom-select" id="prefecture-select">
-            <option value="">都道府県を選択</option>
+    <div class="custom-select-wrapper hierarchical-select">
+        <select name="prefecture_filter" class="custom-select hierarchical-select-main" id="prefecture-select">
+            <option value="">地方を選択</option>
             <?php
-            // 地方の順序を定義
-            $region_order = array(
-                '北海道/東北', '関東', '中部', '近畿', '関西', '中国', '四国', '九州', '沖縄'
-            );
-            
-            // 地方（親ターム）を取得
             $region_terms = get_terms(array(
                 'taxonomy' => 'prefecture',
                 'hide_empty' => false,
-                'parent' => 0, // 親タームのみ
+                'parent' => 0,
                 'orderby' => 'name',
                 'order' => 'ASC'
             ));
             
             if (!is_wp_error($region_terms) && !empty($region_terms)) :
-                // 地方を指定した順序でソート
-                $ordered_regions = array();
-                foreach($region_order as $region_name) {
-                    foreach($region_terms as $term) {
-                        if($term->name === $region_name || strpos($term->name, $region_name) !== false) {
-                            $ordered_regions[] = $term;
-                            break;
-                        }
-                    }
-                }
-                
-                // 順序にない地方を末尾に追加
-                foreach($region_terms as $term) {
-                    $found = false;
-                    foreach($ordered_regions as $ordered) {
-                        if($ordered->term_id === $term->term_id) {
-                            $found = true;
-                            break;
-                        }
-                    }
-                    if(!$found) {
-                        $ordered_regions[] = $term;
-                    }
-                }
-                
-                // 各地方の都道府県を表示
-                foreach($ordered_regions as $region) :
-                    $prefectures = get_terms(array(
-                        'taxonomy' => 'prefecture',
-                        'hide_empty' => false,
-                        'parent' => $region->term_id,
-                        'orderby' => 'name',
-                        'order' => 'ASC'
-                    ));
-                    
-                    if (!is_wp_error($prefectures) && !empty($prefectures)) :
+                foreach($region_terms as $region) :
             ?>
-                        <optgroup label="<?php echo esc_attr($region->name); ?>">
-                            <?php foreach($prefectures as $pref) : ?>
-                                <option value="<?php echo esc_attr($pref->slug); ?>"><?php echo esc_html($pref->name); ?></option>
-                            <?php endforeach; ?>
-                        </optgroup>
-            <?php 
-                    endif;
-                endforeach;
-            endif;
-            ?>
+                    <option value="" data-region-id="<?php echo $region->term_id; ?>"><?php echo esc_html($region->name); ?></option>
+            <?php endforeach; endif; ?>
         </select>
+        
+        <select name="prefecture_filter" class="custom-select hierarchical-select-sub" id="prefecture-sub-select" style="display:none;">
+            <option value="">都道府県を選択</option>
+        </select>
+        
         <div class="select-arrow">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
                 <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -231,13 +188,13 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
             
             <div class="medi-recommend-slider-container">
                 <div class="medi-recommend-slider" id="recommendSlider">
-                    <?php
-                    $recommend_query = new WP_Query(array(
-                        'post_type' => 'store',
-                        'posts_per_page' => 10, // 10店舗に変更
-                        'orderby' => 'date',
-                        'order' => 'DESC'
-                    ));
+                <?php
+$recommend_query = new WP_Query(array(
+    'post_type' => 'store',
+    'posts_per_page' => 8,  // 10から8に変更
+    'orderby' => 'date',
+    'order' => 'DESC'
+));
                     
                     if ($recommend_query->have_posts()) :
                         while ($recommend_query->have_posts()) : $recommend_query->the_post();
@@ -432,13 +389,14 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
         </div>
         
         <div class="medi-situation-grid medi-grid--enhanced">
-            <?php 
-            $situation_terms = get_terms(array(
-                'taxonomy' => 'situation',
-                'hide_empty' => false,
-                'orderby' => 'name',
-                'order' => 'ASC'
-            ));
+        <?php 
+$situation_terms = get_terms(array(
+    'taxonomy' => 'situation',
+    'hide_empty' => true,
+    'orderby' => 'count',
+    'order' => 'DESC',
+    'number' => 8
+));
             
             if (!empty($situation_terms) && !is_wp_error($situation_terms)) : 
                 foreach ($situation_terms as $term) : 
@@ -466,20 +424,39 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
         </div>
     </div>
 </section>
-                <?php
-                // 残りのセクションも同様に近未来デザインを適用
-                $sections = [
-                    'feeling' => ['title' => 'ココロで選ぶ', 'subtitle' => 'あなたの気持ちに寄り添う、特別な体験を見つけよう。'],               
-                    'genre' => ['title' => 'ジャンルで選ぶ', 'subtitle' => 'カフェから本格ディナーまで、様々なジャンルのお店をご紹介']
-                ];
+<?php
+// 残りのセクションも同様に近未来デザインを適用
+$sections = [
+    'feeling' => ['title' => 'ココロで選ぶ', 'subtitle' => 'あなたの気持ちに寄り添う、特別な体験を見つけよう。'],               
+    'genre' => ['title' => 'ジャンルで選ぶ', 'subtitle' => 'カフェから本格ディナーまで、様々なジャンルのお店をご紹介']
+];
                 
                 foreach($sections as $section_key => $section_data) :
-                    $terms = get_terms(array(
-                        'taxonomy' => $section_key,
-                        'hide_empty' => false,
-                        'orderby' => 'name',
-                        'order' => 'ASC'
-                    ));
+                    if ($section_key === 'feeling') {
+                        $terms = get_terms(array(
+                            'taxonomy' => 'feeling',
+                            'hide_empty' => true,
+                            'orderby' => 'count',
+                            'order' => 'DESC',
+                            'number' => 12
+                        ));
+                    } elseif ($section_key === 'genre') {
+                        $terms = get_terms(array(
+                            'taxonomy' => 'genre',
+                            'hide_empty' => true,
+                            'orderby' => 'count',
+                            'order' => 'DESC',
+                            'number' => 20,
+                            'child_of' => 0
+                        ));
+                    } else {
+                        $terms = get_terms(array(
+                            'taxonomy' => $section_key,
+                            'hide_empty' => false,
+                            'orderby' => 'name',
+                            'order' => 'ASC'
+                        ));
+                    }
                 ?>
                     <section class="medi-<?php echo $section_key; ?>-section medi-section--enhanced">
                         <div class="container">
@@ -492,6 +469,7 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                             </div>
                             
                             <div class="medi-<?php echo $section_key; ?>-grid medi-grid--enhanced">
+                                
                                 <?php if (!empty($terms) && !is_wp_error($terms)) : ?>
                                     <?php foreach ($terms as $term) : ?>
                                         <a href="<?php echo esc_url(get_post_type_archive_link('store') . '?' . $section_key . '_filter[]=' . $term->slug . '&active_tab=' . $section_key); ?>" class="medi-<?php echo $section_key; ?>-item medi-item--enhanced">

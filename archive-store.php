@@ -169,11 +169,40 @@ $icon_base_path = get_stylesheet_directory_uri() . '/assets/icons/';
                 </div>
             </div>
 
+            <?php if (!empty($selected_prefecture_slug) || !empty($selected_feelings_slugs) || !empty($selected_situations_slugs) || !empty($selected_genres_slugs) || !empty($keyword_search)) : ?>
+<div class="current-search-conditions">
+    <h3>現在の検索条件</h3>
+    <div class="search-conditions-list">
+        <?php if (!empty($keyword_search)) : ?>
+            <span class="condition-tag" data-type="keyword" data-value="">
+                キーワード: <?php echo esc_html($keyword_search); ?>
+                <button type="button" class="remove-condition">×</button>
+            </span>
+        <?php endif; ?>
+        
+        <?php if (!empty($selected_prefecture_slug)) : 
+            $pref_term = get_term_by('slug', $selected_prefecture_slug, 'prefecture');
+            if ($pref_term) : ?>
+                <span class="condition-tag" data-type="prefecture" data-value="<?php echo esc_attr($selected_prefecture_slug); ?>">
+                    <?php echo esc_html($pref_term->name); ?>
+                    <button type="button" class="remove-condition">×</button>
+                </span>
+            <?php endif; 
+        endif; ?>
+        
+        <!-- 他の条件も同様に追加 -->
+        
+        <a href="<?php echo esc_url(get_post_type_archive_link('store')); ?>" class="clear-all-conditions">すべて削除</a>
+    </div>
+</div>
+<?php endif; ?>
+
             <div class="store-search-form__submit-area">
                 <button type="submit" class="store-search-form__submit-button button">この条件で検索</button>
                 <a href="<?php echo esc_url(get_post_type_archive_link('store')); ?>" class="store-search-form__reset-button button-alt">条件をリセット</a>
             </div>
         </form>
+        
 
         <?php if ( $store_query->have_posts() ) : ?>
             <div class="store-list-container">

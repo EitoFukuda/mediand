@@ -56,6 +56,11 @@ if (! $dp_options) $dp_options = get_desing_plus_option(); // 親テーマのオ
             // echo '<ul class="site-header-custom__menu"><li><a href="' . esc_url(admin_url('nav-menus.php')) . '">メインメニューを設定してください</a></li></ul>';
           }
         ?>
+        <button class="mobile-menu-toggle" aria-label="メニューを開く">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
       </nav>
       <?php // モバイル用のハンバーガーメニューボタンなどをここに追加する場合 ?>
       </div>
