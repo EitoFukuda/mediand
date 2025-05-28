@@ -57,10 +57,11 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
 <!-- 都道府県セレクト（階層対応版） -->
 <div class="search-form-field">
     <label class="search-form-label">エリア</label>
-    <div class="custom-select-wrapper hierarchical-select">
-        <select name="prefecture_filter" class="custom-select hierarchical-select-main" id="prefecture-select">
-            <option value="">地方を選択</option>
+    <div class="custom-select-wrapper">
+        <select name="prefecture_filter" class="custom-select" id="prefecture-select">
+            <option value="">都道府県を選択</option>
             <?php
+            // 地方（親ターム）を取得
             $region_terms = get_terms(array(
                 'taxonomy' => 'prefecture',
                 'hide_empty' => false,
@@ -71,15 +72,28 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
             
             if (!is_wp_error($region_terms) && !empty($region_terms)) :
                 foreach($region_terms as $region) :
+                    // 都道府県（子ターム）を取得
+                    $prefectures = get_terms(array(
+                        'taxonomy' => 'prefecture',
+                        'hide_empty' => false,
+                        'parent' => $region->term_id,
+                        'orderby' => 'name',
+                        'order' => 'ASC'
+                    ));
+                    
+                    if (!is_wp_error($prefectures) && !empty($prefectures)) :
             ?>
-                    <option value="" data-region-id="<?php echo $region->term_id; ?>"><?php echo esc_html($region->name); ?></option>
-            <?php endforeach; endif; ?>
+                        <optgroup label="<?php echo esc_attr($region->name); ?>" disabled>
+                            <?php foreach($prefectures as $pref) : ?>
+                                <option value="<?php echo esc_attr($pref->slug); ?>"><?php echo esc_html($pref->name); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+            <?php 
+                    endif;
+                endforeach;
+            endif;
+            ?>
         </select>
-        
-        <select name="prefecture_filter" class="custom-select hierarchical-select-sub" id="prefecture-sub-select" style="display:none;">
-            <option value="">都道府県を選択</option>
-        </select>
-        
         <div class="select-arrow">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
                 <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

@@ -2886,20 +2886,29 @@ body.admin-bar .site-header-custom.is-fixed-header {
         flex: 0 0 33.333%;
     }
 
+    .main-content-area {
+        width: 100%;
+        max-width: 100%;
+        min-width: auto;
+    }
+
     .store-list-container {
         grid-template-columns: repeat(3, 1fr);
     }
 
     .main-content-with-sidebar {
         flex-direction: column;
+        gap: 30px;
+        padding: 0 15px; /* パディング追加 */
+        max-width: 100%; /* 幅制限 */
+        overflow-x: hidden; /* 横スクロール防止 */
     }
     
     .homepage-sidebar {
         flex: none;
-        position: static;
         width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
+        max-width: 100%;
+        position: static;
     }
     
     .sidebar-sticky {
@@ -2931,7 +2940,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
     }
     
     .mobile-menu-toggle {
-        display: block;
+        display: flex;
         background: none;
         border: none;
         cursor: pointer;
@@ -2943,8 +2952,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
         width: 25px;
         height: 3px;
         background: #333;
-        margin: 5px 0;
         transition: 0.3s;
+        border-radius: 2px;
     }
     
     .mobile-menu-toggle.active span:nth-child(1) {
@@ -3033,33 +3042,38 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* モバイル (768px以下) */
 @media (max-width: 768px) {
+    .main-content-with-sidebar {
+        padding: 0 10px;
+    }
+    
     .container {
-        padding: 0 15px;
+        padding: 0 10px;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     .medi-hero-section--fullscreen {
-        min-height: auto;
+        min-height: 80vh; /* 100vhから80vhに調整 */
         height: auto;
-        padding: 80px 0 60px 0; /* フルスクリーンをやめて適切なパディングに */
+        padding: 60px 0 40px 0;
     }
     
     .medi-hero-section__container {
-        min-height: auto;
+        min-height: 80vh; /* 100vhから80vhに調整 */
         height: auto;
-        padding: 20px 15px;
-        justify-content: center;
+        padding: 60px 0 40px 0;
     }
     
     /* 検索バーをヒーローの下に移動 */
     .medi-hero-section__search-wrapper {
-        position: relative;
-        margin-top: 40px;
-        transform: translateY(100%);
-        z-index: 20;
+        position: static; /* relativeから戻す */
+        margin-top: 0; /* 40pxから0に戻す */
+        transform: none; /* translateYを削除 */
+        z-index: 10;
     }
     
     .search-form-inner {
-        margin-top: 20px;
+        margin-top: 0; /* 20pxから0に戻す */
         padding: 20px 15px;
     }
 
