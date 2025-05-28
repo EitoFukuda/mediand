@@ -155,14 +155,52 @@ $icon_base_path = get_stylesheet_directory_uri() . '/assets/icons/';
                 </div>
 
                 <div id="filter-genre" class="store-search-filter-panel <?php if($active_tab_param === 'genre') echo 'is-active'; ?>">
-                     <?php $genre_terms = get_terms(array('taxonomy' => 'genre', 'hide_empty' => false, 'orderby' => 'name', 'order' => 'ASC')); ?>
-                    <?php if (!empty($genre_terms) && !is_wp_error($genre_terms)) : foreach ($genre_terms as $term) : ?>
-                        <label class="filter-button filter-button--checkbox <?php if (in_array($term->slug, $selected_genres_slugs)) echo 'is-selected'; ?>">
-                            <input type="checkbox" name="genre_filter[]" value="<?php echo esc_attr($term->slug); ?>" <?php checked(in_array($term->slug, $selected_genres_slugs)); ?>>
-                            <?php echo esc_html($term->name); ?>
-                        </label>
-                    <?php endforeach; else: ?><p>「ジャンルで選ぶ」項目が登録されていません。</p><?php endif; ?>
-                </div>
+    <div class="filter-genre__categories">
+        <?php 
+        // ジャンル親タームを取得
+        $genre_parent_terms = get_terms(array(
+            'taxonomy' => 'genre',
+            'parent' => 0,
+            'hide_empty' => false,
+            'orderby' => 'name',
+            'order' => 'ASC'
+        ));
+        
+        if (!empty($genre_parent_terms) && !is_wp_error($genre_parent_terms)) :
+            foreach ($genre_parent_terms as $parent_term) : ?>
+                <button type="button" class="filter-button filter-button--genre-parent" data-genre-id="<?php echo esc_attr($parent_term->term_id); ?>" data-genre-slug="<?php echo esc_attr($parent_term->slug); ?>">
+                    <?php echo esc_html($parent_term->name); ?>
+                </button>
+            <?php endforeach; 
+        else: ?>
+            <p>ジャンルカテゴリが登録されていません。</p>
+        <?php endif; ?>
+    </div>
+    
+    <div class="filter-genre__subcategories-wrapper">
+        <div class="filter-genre__subcategories-placeholder">ジャンルカテゴリを選択してください</div>
+        <?php
+        if (!empty($genre_parent_terms)) {
+            foreach ($genre_parent_terms as $parent_term) {
+                echo '<div class="filter-genre__subcategory-group" data-parent-genre-id="' . esc_attr($parent_term->term_id) . '" style="display:none;">';
+                $child_genres = get_terms(array('taxonomy' => 'genre', 'parent' => $parent_term->term_id, 'hide_empty' => false, 'orderby' => 'name', 'order' => 'ASC'));
+                if (!empty($child_genres) && !is_wp_error($child_genres)) {
+                    foreach ($child_genres as $child_term) {
+                        $is_genre_selected = in_array($child_term->slug, $selected_genres_slugs);
+                        echo '<label class="filter-button filter-button--checkbox ' . ($is_genre_selected ? 'is-selected' : '') . '">';
+                        echo '<input type="checkbox" name="genre_filter[]" value="' . esc_attr($child_term->slug) . '" ' . checked($is_genre_selected, true, false) . '>';
+                        echo esc_html($child_term->name);
+                        echo '</label>';
+                    }
+                } else { 
+                    echo '<p class="no-genres-message">このカテゴリのジャンルは登録されていません。</p>';
+                }
+                echo '</div>';
+            }
+        }
+        ?>
+    </div>
+</div>
 
                 <div id="filter-keyword" class="store-search-filter-panel <?php if($active_tab_param === 'keyword') echo 'is-active'; ?>">
                     <input type="search" class="store-search-filter__keyword-input" placeholder="地域名・お店の名前・特徴・気分・目的など" value="<?php echo esc_attr($keyword_search); ?>" name="s" title="検索キーワード" />
@@ -170,31 +208,7 @@ $icon_base_path = get_stylesheet_directory_uri() . '/assets/icons/';
             </div>
 
             <?php if (!empty($selected_prefecture_slug) || !empty($selected_feelings_slugs) || !empty($selected_situations_slugs) || !empty($selected_genres_slugs) || !empty($keyword_search)) : ?>
-<div class="current-search-conditions">
-    <h3>現在の検索条件</h3>
-    <div class="search-conditions-list">
-        <?php if (!empty($keyword_search)) : ?>
-            <span class="condition-tag" data-type="keyword" data-value="">
-                キーワード: <?php echo esc_html($keyword_search); ?>
-                <button type="button" class="remove-condition">×</button>
-            </span>
-        <?php endif; ?>
-        
-        <?php if (!empty($selected_prefecture_slug)) : 
-            $pref_term = get_term_by('slug', $selected_prefecture_slug, 'prefecture');
-            if ($pref_term) : ?>
-                <span class="condition-tag" data-type="prefecture" data-value="<?php echo esc_attr($selected_prefecture_slug); ?>">
-                    <?php echo esc_html($pref_term->name); ?>
-                    <button type="button" class="remove-condition">×</button>
-                </span>
-            <?php endif; 
-        endif; ?>
-        
-        <!-- 他の条件も同様に追加 -->
-        
-        <a href="<?php echo esc_url(get_post_type_archive_link('store')); ?>" class="clear-all-conditions">すべて削除</a>
-    </div>
-</div>
+
 <?php endif; ?>
 
             <div class="store-search-form__submit-area">

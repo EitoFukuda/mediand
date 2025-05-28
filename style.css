@@ -35,6 +35,10 @@
     padding: 0 20px;
 }
 
+.page-title {
+    display: none;
+}
+
 /* 共通セクションスタイル */
 .medi-section-title {
     font-size: 32px; /* 48pxから32pxに縮小 */
@@ -955,6 +959,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .medi-genre-section {
     position: relative;
     overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 /* セクション間のマージン調整 */
@@ -988,8 +994,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 }
 
 .medi-recommend-slide {
-    flex: 0 0 25%;
-    padding: 0 15px;
+    flex: 0 0 22%; /* 25%→22%で幅を狭く */
+    padding: 0 24px; /* paddingを広めに */
 }
 
 .medi-slider-nav {
@@ -1121,6 +1127,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .medi-region-section {
     padding: 80px 0;
     background: transparent; /* 背景を透明に */
+    overflow-x: hidden;
 }
 
 .medi-region-accordion {
@@ -1226,6 +1233,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .medi-feeling-section {
     padding: 100px 0;
     background: #fff;
+    overflow-x: hidden;
 }
 
 .medi-feeling-grid {
@@ -1304,6 +1312,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .medi-situation-section {
     padding: 80px 0;
     background: transparent; /* 背景を透明に */
+    overflow-x: hidden;
 }
 
 .medi-situation-grid {
@@ -1390,6 +1399,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 .medi-genre-section {
     padding: 80px 0;
     background: transparent; /* 背景を透明に */
+    overflow-x: hidden;
 }
 
 .medi-genre-grid {
@@ -1680,6 +1690,91 @@ body.admin-bar .site-header-custom.is-fixed-header {
     text-align: center;
     padding: 30px;
     font-style: italic;
+}
+
+/* ジャンル用のスタイル（地域と同じ構成） */
+.filter-genre__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.filter-genre__subcategories-wrapper {
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #f1f3f4;
+    position: relative;
+    display: block;
+    clear: both;
+}
+
+.filter-genre__subcategories-wrapper::before {
+    content: '詳細ジャンルを選択';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: #fff;
+    padding: 0 10px;
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.filter-genre__subcategory-group {
+    display: none !important;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(248, 249, 250, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    animation: slideDownSmooth 0.4s ease-out;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filter-genre__subcategory-group.active {
+    display: flex !important;
+}
+
+.filter-genre__subcategories-placeholder {
+    color: #adb5bd;
+    font-size: 14px;
+    text-align: center;
+    padding: 30px;
+    font-style: italic;
+}
+
+.filter-button--genre-parent {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-color: #ced4da;
+    font-weight: 600;
+    color: #495057;
+}
+
+.filter-button--genre-parent.is-selected {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-color: #28a745;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3);
+}
+
+.filter-button--genre-parent:hover:not(.is-selected) {
+    background: linear-gradient(135deg, #e9ecef, #dee2e6);
+    border-color: #adb5bd;
+}
+
+/* ジャンルの初期状態設定 */
+.filter-genre__subcategories-wrapper {
+    display: block;
+}
+
+.filter-genre__subcategories-placeholder {
+    display: block;
 }
 
 /* キーワード検索 */
@@ -2883,7 +2978,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 /* タブレット・小型デスクトップ (1200px以下) */
 @media (max-width: 1200px) {
     .medi-recommend-slide {
-        flex: 0 0 33.333%;
+        flex: 0 0 30%;
+        padding: 0 18px;
     }
 
     .main-content-area {
@@ -2936,47 +3032,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
 /* タブレット (992px以下) */
 @media (max-width: 992px) {
     .site-header-custom__nav {
-        display: none;
+        display: block !important;
     }
-    
     .mobile-menu-toggle {
-        display: flex;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 5px;
-    }
-    
-    .mobile-menu-toggle span {
-        display: block;
-        width: 25px;
-        height: 3px;
-        background: #333;
-        transition: 0.3s;
-        border-radius: 2px;
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(1) {
-        transform: rotate(-45deg) translate(-5px, 6px);
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(3) {
-        transform: rotate(45deg) translate(-5px, -6px);
-    }
-    
-    .site-header-custom__nav.mobile-active {
-        display: block;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: #fff;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 999;
+        display: none !important;
     }
     
     .site-header-custom__menu {
@@ -2989,7 +3048,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
     }
 
     .medi-recommend-slide {
-        flex: 0 0 50%;
+        flex: 0 0 45%;
+        padding: 0 14px;
     }
 
     .site-footer-custom__nav-widgets {
@@ -3079,6 +3139,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
     .medi-recommend-slide {
         flex: 0 0 100%;
+        padding: 0 10px;
     }
 
     .medi-recommend-slider-wrapper {
@@ -3399,4 +3460,55 @@ body.admin-bar .site-header-custom.is-fixed-header {
     .sidebar-ad-area {
         display: none !important;
     }
+}
+
+/* --- header navのレスポンシブ制御 --- */
+@media (max-width: 992px) {
+  .site-header-custom__nav {
+    display: block !important;
+  }
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+}
+@media (min-width: 993px) {
+  .site-header-custom__nav {
+    display: block !important;
+  }
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+}
+
+/* --- medi-recommend-sectionのカードサイズ調整 --- */
+.medi-recommend-card {
+  height: 320px; /* 例: 380px→320px */
+  padding: 16px;
+}
+.medi-recommend-card__image {
+  height: 140px; /* 例: 200px→140px */
+}
+@media (max-width: 768px) {
+  .medi-recommend-card {
+    height: 220px;
+    padding: 8px;
+  }
+  .medi-recommend-card__image {
+    height: 80px;
+  }
+}
+
+/* --- single-store: store-info-cardとstore-basic-infoの幅をモバイルで揃える --- */
+@media (max-width: 768px) {
+  .store-basic-info {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 30px 20px !important;
+    box-sizing: border-box;
+  }
+  .store-info-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
 }

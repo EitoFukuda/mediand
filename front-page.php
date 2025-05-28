@@ -55,12 +55,25 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
                             <div class="search-form-row">
                                 <!-- 都道府県セレクト -->
 <!-- 都道府県セレクト（階層対応版） -->
+<!-- 都道府県セレクト（階層対応版） -->
 <div class="search-form-field">
     <label class="search-form-label">エリア</label>
     <div class="custom-select-wrapper">
         <select name="prefecture_filter" class="custom-select" id="prefecture-select">
             <option value="">都道府県を選択</option>
             <?php
+            // 地方の順序を定義
+            $region_order = array(
+                '北海道/東北' => array('北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'),
+                '関東' => array('茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県'),
+                '中部' => array('新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県'),
+                '近畿' => array('三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'),
+                '中国' => array('鳥取県', '島根県', '岡山県', '広島県', '山口県'),
+                '四国' => array('徳島県', '香川県', '愛媛県', '高知県'),
+                '九州' => array('福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県'),
+                '沖縄' => array('沖縄県')
+            );
+            
             // 地方（親ターム）を取得
             $region_terms = get_terms(array(
                 'taxonomy' => 'prefecture',
@@ -71,24 +84,35 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
             ));
             
             if (!is_wp_error($region_terms) && !empty($region_terms)) :
-                foreach($region_terms as $region) :
-                    // 都道府県（子ターム）を取得
-                    $prefectures = get_terms(array(
-                        'taxonomy' => 'prefecture',
-                        'hide_empty' => false,
-                        'parent' => $region->term_id,
-                        'orderby' => 'name',
-                        'order' => 'ASC'
-                    ));
+                foreach($region_order as $region_name => $expected_prefs) :
+                    // 該当する地方タームを探す
+                    $current_region = null;
+                    foreach($region_terms as $region) {
+                        if($region->name === $region_name || strpos($region->name, $region_name) !== false) {
+                            $current_region = $region;
+                            break;
+                        }
+                    }
                     
-                    if (!is_wp_error($prefectures) && !empty($prefectures)) :
+                    if($current_region) :
+                        // 都道府県（子ターム）を取得
+                        $prefectures = get_terms(array(
+                            'taxonomy' => 'prefecture',
+                            'hide_empty' => false,
+                            'parent' => $current_region->term_id,
+                            'orderby' => 'name',
+                            'order' => 'ASC'
+                        ));
+                        
+                        if (!is_wp_error($prefectures) && !empty($prefectures)) :
             ?>
-                        <optgroup label="<?php echo esc_attr($region->name); ?>" disabled>
-                            <?php foreach($prefectures as $pref) : ?>
-                                <option value="<?php echo esc_attr($pref->slug); ?>"><?php echo esc_html($pref->name); ?></option>
-                            <?php endforeach; ?>
-                        </optgroup>
+                            <optgroup label="<?php echo esc_attr($region_name); ?>">
+                                <?php foreach($prefectures as $pref) : ?>
+                                    <option value="<?php echo esc_attr($pref->slug); ?>"><?php echo esc_html($pref->name); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
             <?php 
+                        endif;
                     endif;
                 endforeach;
             endif;
@@ -102,35 +126,73 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
     </div>
 </div>
                                 
-                                <!-- ジャンルセレクト -->
-                                <div class="search-form-field">
-                                    <label class="search-form-label">ジャンル</label>
-                                    <div class="custom-select-wrapper">
-                                        <select name="genre_filter[]" class="custom-select" id="genre-select">
-                                            <option value="">ジャンルを選択</option>
-                                            <?php
-                                            $genres = get_terms(array(
-                                                'taxonomy' => 'genre',
-                                                'hide_empty' => false,
-                                                'orderby' => 'name',
-                                                'order' => 'ASC'
-                                            ));
-                                            if (!is_wp_error($genres) && !empty($genres)) :
-                                                foreach($genres as $genre) :
-                                            ?>
-                                                <option value="<?php echo esc_attr($genre->slug); ?>"><?php echo esc_html($genre->name); ?></option>
-                                            <?php 
-                                                endforeach;
-                                            endif;
-                                            ?>
-                                        </select>
-                                        <div class="select-arrow">
-                                            <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                                                <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
+<!-- ジャンルセレクト（階層対応版） -->
+<div class="search-form-field">
+    <label class="search-form-label">ジャンル</label>
+    <div class="custom-select-wrapper">
+        <select name="genre_filter" class="custom-select" id="genre-select">
+            <option value="">ジャンルを選択</option>
+            <?php
+            // ジャンルの親タームを取得
+            $genre_parent_terms = get_terms(array(
+                'taxonomy' => 'genre',
+                'hide_empty' => false,
+                'parent' => 0,
+                'orderby' => 'name',
+                'order' => 'ASC'
+            ));
+            
+            if (!is_wp_error($genre_parent_terms) && !empty($genre_parent_terms)) :
+                foreach($genre_parent_terms as $parent_genre) :
+                    // 子ジャンルを取得
+                    $child_genres = get_terms(array(
+                        'taxonomy' => 'genre',
+                        'hide_empty' => false,
+                        'parent' => $parent_genre->term_id,
+                        'orderby' => 'name',
+                        'order' => 'ASC'
+                    ));
+                    
+                    if (!is_wp_error($child_genres) && !empty($child_genres)) :
+            ?>
+                        <optgroup label="<?php echo esc_attr($parent_genre->name); ?>">
+                            <?php foreach($child_genres as $child_genre) : ?>
+                                <option value="<?php echo esc_attr($child_genre->slug); ?>"><?php echo esc_html($child_genre->name); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+            <?php 
+                    else :
+                        // 子がない場合は親をそのまま表示
+            ?>
+                        <option value="<?php echo esc_attr($parent_genre->slug); ?>"><?php echo esc_html($parent_genre->name); ?></option>
+            <?php
+                    endif;
+                endforeach;
+            else :
+                // 親がない場合は全ジャンルを表示
+                $all_genres = get_terms(array(
+                    'taxonomy' => 'genre',
+                    'hide_empty' => false,
+                    'orderby' => 'name',
+                    'order' => 'ASC'
+                ));
+                if (!is_wp_error($all_genres) && !empty($all_genres)) :
+                    foreach($all_genres as $genre) :
+            ?>
+                        <option value="<?php echo esc_attr($genre->slug); ?>"><?php echo esc_html($genre->name); ?></option>
+            <?php 
+                    endforeach;
+                endif;
+            endif;
+            ?>
+        </select>
+        <div class="select-arrow">
+            <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
+</div>
                                 
                                 <!-- キーワード検索 -->
                                 <div class="search-form-field search-form-field--keyword">

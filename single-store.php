@@ -405,3 +405,17 @@ $address_for_map = get_field('store_address', $store_id);
 </div>
 
 <?php get_footer(); ?>
+
+@media (max-width: 768px) {
+  .store-basic-info {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 30px 20px !important;
+    box-sizing: border-box;
+  }
+  .store-info-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+}

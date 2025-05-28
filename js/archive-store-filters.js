@@ -214,6 +214,70 @@ jQuery(document).ready(function($) {
         }
     }
 
+    // 既存のコード内、initRegionAccordion関数の後に追加
+function initGenreAccordion() {
+    const $genreButtons = $('.filter-button--genre-parent');
+    const $genreGroups = $('.filter-genre__subcategory-group');
+    const $genrePlaceholder = $('.filter-genre__subcategories-placeholder');
+    
+    console.log('[Archive Filters] Genre setup - Buttons:', $genreButtons.length, 'Groups:', $genreGroups.length);
+    
+    $genreButtons.on('click', function() {
+        const genreId = $(this).data('genre-id');
+        const $button = $(this);
+        
+        console.log('[Archive Filters] Genre clicked:', genreId, 'Text:', $button.text().trim());
+        
+        // 他のジャンルボタンの選択を解除
+        $genreButtons.not($button).removeClass('is-selected');
+        
+        // 全てのジャンルグループを非表示
+        $genreGroups.removeClass('active').slideUp(200);
+        
+        if ($button.hasClass('is-selected')) {
+            // 同じジャンルを再度クリックした場合は選択解除
+            console.log('[Archive Filters] Deselecting genre:', genreId);
+            $button.removeClass('is-selected');
+            $genrePlaceholder.text('ジャンルカテゴリを選択してください').slideDown(200);
+            
+            // 対応するジャンル選択もクリア
+            const $targetGroup = $(`[data-parent-genre-id="${genreId}"]`);
+            $targetGroup.find('input[type="checkbox"]').prop('checked', false);
+            $targetGroup.find('.filter-button').removeClass('is-selected');
+        } else {
+            // 新しいジャンルを選択
+            console.log('[Archive Filters] Selecting new genre:', genreId);
+            $button.addClass('is-selected');
+            
+            // 対象のジャンルグループのみ表示
+            const $targetGroup = $(`[data-parent-genre-id="${genreId}"]`);
+            if ($targetGroup.length && $targetGroup.find('label').length) {
+                $targetGroup.slideDown(300).addClass('active');
+                $genrePlaceholder.hide();
+                console.log('[Archive Filters] Genre group displayed for genre:', genreId);
+            } else {
+                $genrePlaceholder.text('このカテゴリのジャンルは登録されていません。').slideDown(200);
+                console.log('[Archive Filters] No genres found for category:', genreId);
+            }
+        }
+    });
+}
+
+function setupInitialGenreState() {
+    const $initialSelectedGenre = $('input[name="genre_filter[]"]:checked');
+    if ($initialSelectedGenre.length) {
+        const $initialGroup = $initialSelectedGenre.closest('.filter-genre__subcategory-group');
+        const initialGenreId = $initialGroup.data('parent-genre-id');
+        if (initialGenreId) {
+            $(`.filter-button--genre-parent[data-genre-id="${initialGenreId}"]`).addClass('is-selected');
+            $initialGroup.show().addClass('active');
+            $('.filter-genre__subcategories-placeholder').hide();
+        }
+    } else {
+        $('.filter-genre__subcategories-placeholder').show();
+    }
+}
+
     // --- リセットボタン ---
     $('.store-search-form__reset-button').on('click', function(e) {
         e.preventDefault();
@@ -246,6 +310,22 @@ jQuery(document).ready(function($) {
     function initialize() {
         console.log('[Archive Filters] Starting initialization...');
         
+        try {
+            initRegionAccordion();
+            initGenreAccordion();
+            initScrollAnimations();
+            initHeroSearchForm();
+            initCardEffects();
+            initSmoothScroll();
+            initLazyLoading();
+            initRecommendSlider();
+            handleErrors();
+            
+            console.log('[Archive Filters] Initialization completed successfully');
+        } catch (error) {
+            console.error('[Archive Filters] Initialization failed:', error);
+        }
+        
         // タブ初期化
         initializeTabs();
         
@@ -254,6 +334,7 @@ jQuery(document).ready(function($) {
         
         // 地域状態設定
         setupInitialRegionState();
+        setupInitialGenreState();
         
         console.log('[Archive Filters] Initialization completed');
     }
