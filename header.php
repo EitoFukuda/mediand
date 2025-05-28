@@ -41,28 +41,26 @@ if (! $dp_options) $dp_options = get_desing_plus_option(); // 親テーマのオ
           <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/logo.png" alt="<?php bloginfo('name'); // サイト名 ?>" class="site-header-custom__logo-img">
         </a>
       </div>
-      <nav class="site-header-custom__nav" role="navigation" aria-label="<?php esc_attr_e( 'Main Navigation', 'gensen_tcd050-child' ); ?>">
-        <?php
-          if (has_nav_menu('primary')) { // 'primary' というメニュー位置が登録・設定されていれば表示
-            wp_nav_menu(array(
-              'theme_location' => 'primary',
-              'container'      => false, // ulタグを直接出力
-              'menu_class'     => 'site-header-custom__menu', // メニューのulタグに付与するクラス
-              'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-              'fallback_cb'    => false, // メニューが設定されていなくてもエラーを出さない
-            ));
-          } else {
-            // メニューが設定されていない場合の代替表示（任意）
-            // echo '<ul class="site-header-custom__menu"><li><a href="' . esc_url(admin_url('nav-menus.php')) . '">メインメニューを設定してください</a></li></ul>';
-          }
-        ?>
-      </nav>
-       <!-- ハンバーガーメニューボタンを追加 -->
-       <button class="mobile-menu-toggle" aria-label="メニューを開く" style="display: none;">
-          <span></span>
-          <span></span>
-          <span></span>
-      </button>
+      <!-- 37-48行目を以下に変更 -->
+<nav class="site-header-custom__nav" role="navigation" aria-label="<?php esc_attr_e( 'Main Navigation', 'gensen_tcd050-child' ); ?>">
+    <?php
+    if (has_nav_menu('primary')) { 
+        wp_nav_menu(array(
+            'theme_location' => 'primary',
+            'container'      => false,
+            'menu_class'     => 'site-header-custom__menu',
+            'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
+            'fallback_cb'    => false,
+        ));
+    } else {
+        // デフォルトメニューを表示
+        echo '<ul class="site-header-custom__menu">';
+        echo '<li><a href="' . esc_url(home_url('/')) . '">ホーム</a></li>';
+        echo '<li><a href="' . esc_url(get_post_type_archive_link('store')) . '">店舗一覧</a></li>';
+        echo '</ul>';
+    }
+    ?>
+</nav>
       <?php // モバイル用のハンバーガーメニューボタンなどをここに追加する場合 ?>
       </div>
   </div>

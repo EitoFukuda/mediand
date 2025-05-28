@@ -2277,6 +2277,24 @@ body.admin-bar .site-header-custom.is-fixed-header {
     opacity: 1;
     animation: rotate-border 2s linear infinite;
  }
+
+ .medi-mobile-search-section {
+    display: none;
+    padding: 40px 0;
+    background: linear-gradient(135deg, rgba(248, 249, 255, 0.8), rgba(240, 248, 255, 0.9));
+}
+
+@media (max-width: 768px) {
+    .medi-mobile-search-section {
+        display: block;
+    }
+}
+
+.medi-mobile-search-form .search-form-inner {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(232, 180, 232, 0.3);
+}
  
  @keyframes rotate-border {
     0% { transform: rotate(0deg); }
@@ -3113,9 +3131,23 @@ body.admin-bar .site-header-custom.is-fixed-header {
     }
 
     .medi-hero-section--fullscreen {
+        background-image: none !important;
         min-height: 80vh; /* 100vhから80vhに調整 */
         height: auto;
         padding: 60px 0 40px 0;
+    }
+
+    .medi-hero-section--fullscreen::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: var(--mobile-bg);
+        background-size: cover;
+        background-position: center;
+        z-index: -1;
     }
     
     .medi-hero-section__container {
@@ -3126,6 +3158,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
     
     /* 検索バーをヒーローの下に移動 */
     .medi-hero-section__search-wrapper {
+        display: none;
         position: static; /* relativeから戻す */
         margin-top: 0; /* 40pxから0に戻す */
         transform: none; /* translateYを削除 */
@@ -3142,13 +3175,16 @@ body.admin-bar .site-header-custom.is-fixed-header {
         padding: 0 10px;
     }
 
+    .medi-recommend-slider {
+        transition: transform 0.5s ease;
+    }
+
     .medi-recommend-slider-wrapper {
-        padding: 0 40px;
+        padding: 0;
     }
     
     .medi-slider-nav {
-        width: 40px;
-        height: 40px;
+        display: none;
     }
 
     .medi-section-subtitle {
@@ -3464,12 +3500,16 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* --- header navのレスポンシブ制御 --- */
 @media (max-width: 992px) {
-  .site-header-custom__nav {
-    display: block !important;
-  }
-  .mobile-menu-toggle {
-    display: none !important;
-  }
+    .site-header-custom__menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0;
+    }
+    
+    .site-header-custom__menu li {
+        margin: 5px 15px;
+    }
 }
 @media (min-width: 993px) {
   .site-header-custom__nav {
@@ -3510,5 +3550,28 @@ body.admin-bar .site-header-custom.is-fixed-header {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box;
+  }
+}
+
+/* =============================
+   検索フォーム表示制御
+============================= */
+/* PC版検索フォーム（ヒーロー内）をデフォルトで表示、モバイルでは非表示 */
+.medi-hero-section__search-wrapper {
+  display: flex;
+}
+
+/* モバイル検索フォームはデフォルト非表示 */
+.medi-mobile-search-section {
+  display: none;
+}
+
+/* 768px以下（モバイル縦画面）ではPC版を非表示、モバイル版を表示 */
+@media (max-width: 768px) {
+  .medi-hero-section__search-wrapper {
+    display: none !important;
+  }
+  .medi-mobile-search-section {
+    display: block !important;
   }
 }

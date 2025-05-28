@@ -88,12 +88,25 @@ function initRecommendSlider() {
             }, 50);
         }
         
+        
         // ボタンの有効/無効
         $prevBtn.prop('disabled', currentIndex === 0);
         $nextBtn.prop('disabled', currentIndex >= totalSlides - slidesPerView);
         
         console.log('[medi& Homepage] Slider updated:', currentIndex, 'of', totalSlides);
     }
+
+    // 87行目付近の initRecommendSlider 関数内に追加
+function startAutoSlide() {
+    stopAutoSlide();
+    if (totalSlides > slidesPerView) {
+        // モバイルの場合は3秒、それ以外は5秒
+        const interval = $(window).width() <= 768 ? 3000 : 5000;
+        autoSlideInterval = setInterval(() => {
+            nextSlide();
+        }, interval);
+    }
+}
     
     function nextSlide() {
         if (isTransitioning) return;
@@ -202,6 +215,15 @@ function initRecommendSlider() {
     startAutoSlide();
     
     console.log('[medi& Homepage] Recommend slider initialized with', totalSlides, 'slides');
+}
+
+function initMobileHeroBackground() {
+    const $heroSection = $('.medi-hero-section--fullscreen');
+    const mobileBg = $heroSection.data('mobile-bg');
+    
+    if (mobileBg && $(window).width() <= 768) {
+        $heroSection.css('--mobile-bg', `url('${mobileBg}')`);
+    }
 }
 
     // =====================================
@@ -375,6 +397,8 @@ function initialize() {
     } catch (error) {
         console.error('[medi& Homepage] Initialization failed:', error);
     }
+
+    initMobileHeroBackground();
 }
 
     // DOM準備完了後に初期化実行
