@@ -1,0 +1,35 @@
+User-agent: *
+Allow: /
+
+# 管理画面をクロール対象外に
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /wp-content/plugins/
+Disallow: /wp-content/themes/
+Allow: /wp-content/themes/*/assets/
+Allow: /wp-content/uploads/
+
+# 検索結果ページを除外
+Disallow: /?s=
+Disallow: /search/
+
+# プライベートページを除外
+Disallow: /private/
+Disallow: /draft/
+
+# サイトマップの場所を指定
+Sitemap: https://medi-and.com/wp-sitemap.xml
+
+# よくあるbot対応
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# 悪質なbotをブロック
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /

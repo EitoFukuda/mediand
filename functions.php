@@ -194,10 +194,11 @@ add_action( 'wp_enqueue_scripts', 'medi_gensen_child_enqueue_stagewise_toolbar',
  */
 function medi_gensen_child_register_nav_menus() {
     register_nav_menus(array(
-        'primary' => esc_html__('Primary Navigation', 'gensen_tcd050-child'),
-        'footer_category_menu' => esc_html__('Footer Category Menu', 'gensen_tcd050-child'),
-        'footer_sitemap_menu' => esc_html__('Footer Sitemap Menu', 'gensen_tcd050-child'),
-        'footer_support_menu' => esc_html__('Footer Support Menu', 'gensen_tcd050-child'),
+        'primary' => __('Primary Navigation', 'gensen_tcd050-child'),
+        'main_nav' => __('Main Navigation', 'gensen_tcd050-child'), // 追加
+        'footer_category_menu' => __('Footer Category Menu', 'gensen_tcd050-child'),
+        'footer_sitemap_menu' => __('Footer Sitemap Menu', 'gensen_tcd050-child'),
+        'footer_support_menu' => __('Footer Support Menu', 'gensen_tcd050-child'),
     ));
 }
 add_action('after_setup_theme', 'medi_gensen_child_register_nav_menus');
@@ -587,4 +588,190 @@ wp_enqueue_script(
     wp_get_theme()->get('Version'),
     true
 );
+
+/**
+ * SEO対策機能
+ */
+
+// メタタグの追加
+function medi_add_meta_tags() {
+    if (is_singular('store')) {
+        global $post;
+        $store_id = $post->ID;
+        $store_title = get_the_title();
+        $store_content = get_the_content();
+        $store_excerpt = wp_trim_words($store_content, 30, '...');
+        
+        // 都道府県取得
+        $prefecture_terms = get_the_terms($store_id, 'prefecture');
+        $prefecture_name = '';
+        if (!empty($prefecture_terms) && !is_wp_error($prefecture_terms)) {
+            foreach($prefecture_terms as $term) {
+                if($term->parent != 0) {
+                    $prefecture_name = $term->name;
+                    break;
+                }
+            }
+        }
+        
+        // ジャンル取得
+        $genre_terms = get_the_terms($store_id, 'genre');
+        $genre_name = '';
+        if (!empty($genre_terms) && !is_wp_error($genre_terms)) {
+            $genre_name = $genre_terms[0]->name;
+        }
+        
+        // メタディスクリプション生成
+        $meta_description = $prefecture_name . 'の' . $genre_name . '「' . $store_title . '」。' . $store_excerpt;
+        $meta_description = wp_trim_words($meta_description, 25, '...');
+        
+        echo '<meta name="description" content="' . esc_attr($meta_description) . '">' . "\n";
+        echo '<meta name="keywords" content="' . esc_attr($prefecture_name . ',' . $genre_name . ',' . $store_title) . '">' . "\n";
+    } elseif (is_post_type_archive('store')) {
+        echo '<meta name="description" content="全国の魅力的な店舗を地域・ジャンル・気分で検索できるグルメ情報サイト。おすすめレストラン・カフェ・居酒屋など幅広いジャンルの店舗情報をご紹介。">' . "\n";
+        echo '<meta name="keywords" content="グルメ,レストラン,カフェ,居酒屋,店舗検索,地域検索">' . "\n";
+    } elseif (is_front_page()) {
+        echo '<meta name="description" content="SNSからリアルへ - 全国の素敵な店舗を発見できるポータルサイト「medi&」。地域・ジャンル・気分から理想のお店を見つけよう。">' . "\n";
+        echo '<meta name="keywords" content="medi&,メディアンド,グルメ検索,店舗検索,レストラン,カフェ">' . "\n";
+    }
+}
+add_action('wp_head', 'medi_add_meta_tags');
+
+/**
+ * 構造化データ（JSON-LD）の追加
+ */
+function medi_add_structured_data() {
+    if (is_singular('store')) {
+        global $post;
+        $store_id = $post->ID;
+        $store_title = get_the_title();
+        $store_url = get_permalink();
+        $store_image = get_the_post_thumbnail_url($store_id, 'large');
+        
+        // 店舗情報取得
+        $store_phone = get_field('store_phone_number', $store_id);
+        $store_address = get_field('store_address', $store_id);
+        $store_hours = get_field('store_hours', $store_id);
+        
+        // 都道府県・ジャンル取得
+        $prefecture_terms = get_the_terms($store_id, 'prefecture');
+        $genre_terms = get_the_terms($store_id, 'genre');
+        
+        $structured_data = array(
+            '@context' => 'https://schema.org',
+            '@type' => 'Restaurant',
+            'name' => $store_title,
+            'url' => $store_url,
+            'description' => wp_trim_words(get_the_content(), 30, '...'),
+        );
+        
+        if ($store_image) {
+            $structured_data['image'] = $store_image;
+        }
+        
+        if ($store_phone) {
+            $structured_data['telephone'] = $store_phone;
+        }
+        
+        if ($store_address) {
+            $structured_data['address'] = array(
+                '@type' => 'PostalAddress',
+                'streetAddress' => $store_address
+            );
+        }
+        
+        if ($store_hours) {
+            $structured_data['openingHours'] = $store_hours;
+        }
+        
+        echo '<script type="application/ld+json">' . json_encode($structured_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>' . "\n";
+    }
+}
+add_action('wp_head', 'medi_add_structured_data');
+
+/**
+ * サイトマップの生成支援
+ */
+function medi_sitemap_urls($urls) {
+    // 店舗一覧ページを追加
+    $urls[] = array(
+        'loc' => get_post_type_archive_link('store'),
+        'changefreq' => 'daily',
+        'priority' => 0.8
+    );
+    
+    // 各店舗ページを追加
+    $stores = get_posts(array(
+        'post_type' => 'store',
+        'posts_per_page' => -1,
+        'post_status' => 'publish'
+    ));
+    
+    foreach ($stores as $store) {
+        $urls[] = array(
+            'loc' => get_permalink($store->ID),
+            'changefreq' => 'weekly',
+            'priority' => 0.6
+        );
+    }
+    
+    return $urls;
+}
+add_filter('wp_sitemaps_posts_pre_url_list', 'medi_sitemap_urls');
+
+/**
+ * パフォーマンス最適化
+ */
+// 不要なWordPress機能の無効化
+remove_action('wp_head', 'wlwmanifest_link');
+remove_action('wp_head', 'rsd_link');
+remove_action('wp_head', 'wp_generator');
+remove_action('wp_head', 'feed_links', 2);
+remove_action('wp_head', 'feed_links_extra', 3);
+remove_action('wp_head', 'index_rel_link');
+remove_action('wp_head', 'parent_post_rel_link', 10, 0);
+remove_action('wp_head', 'start_post_rel_link', 10, 0);
+remove_action('wp_head', 'adjacent_posts_rel_link', 10, 0);
+
+// 画像の遅延読み込み
+function medi_lazy_loading($attr, $attachment, $size) {
+    $attr['loading'] = 'lazy';
+    return $attr;
+}
+add_filter('wp_get_attachment_image_attributes', 'medi_lazy_loading', 10, 3);
+
+/**
+ * パンくずリスト構造化データ
+ */
+function medi_breadcrumb_structured_data() {
+    if (is_singular('store')) {
+        $breadcrumbs = array(
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => array(
+                array(
+                    '@type' => 'ListItem',
+                    'position' => 1,
+                    'name' => 'ホーム',
+                    'item' => home_url()
+                ),
+                array(
+                    '@type' => 'ListItem',
+                    'position' => 2,
+                    'name' => '店舗一覧',
+                    'item' => get_post_type_archive_link('store')
+                ),
+                array(
+                    '@type' => 'ListItem',
+                    'position' => 3,
+                    'name' => get_the_title(),
+                    'item' => get_permalink()
+                )
+            )
+        );
+        
+        echo '<script type="application/ld+json">' . json_encode($breadcrumbs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>' . "\n";
+    }
+}
+add_action('wp_head', 'medi_breadcrumb_structured_data');
 ?>

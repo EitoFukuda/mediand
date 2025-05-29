@@ -30,6 +30,11 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
     style="background-image: url('<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png');"
     data-mobile-bg="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero_mobile.png">
     
+    <!-- モバイル用ヒーロー画像 -->
+    <div class="medi-hero-mobile-image">
+        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero_mobile.png" alt="ヒーロー画像" />
+    </div>
+    
     <!-- 動的背景要素 -->
     <div class="medi-hero-section__bg-effects">
         <div class="bg-particle bg-particle--1"></div>
