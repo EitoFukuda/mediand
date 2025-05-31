@@ -37,6 +37,32 @@ function medi_gensen_child_enqueue_assets() {
 
     // トップページでのJavaScript読み込み
     if (is_front_page() || is_home()) {
+        // 動画背景用のJavaScriptを読み込み
+        wp_enqueue_script(
+            'hero-video',
+            get_stylesheet_directory_uri() . '/js/hero-video.js',
+            array('jquery'),
+            wp_get_theme()->get('Version'),
+            true
+        );
+
+         // ヒーロー動画制御スクリプトを追加
+    wp_enqueue_script(
+        'medi-hero-video-js',
+        get_stylesheet_directory_uri() . '/js/hero-video.js',
+        array(),
+        wp_get_theme()->get('Version'),
+        true
+    );
+    
+    // ローカライゼーション（必要に応じて）
+    wp_localize_script('medi-homepage-js', 'mediHomepage', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('medi_homepage_nonce'),
+        'store_archive_url' => get_post_type_archive_link('store')
+    ));
+        
+        // ホームページ用のJavaScriptを読み込み
         wp_enqueue_script(
             'medi-homepage-js',
             get_stylesheet_directory_uri() . '/js/homepage.js',

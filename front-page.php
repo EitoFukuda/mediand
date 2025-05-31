@@ -26,29 +26,19 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
     
 <?php // --- フルスクリーンヒーローセクション --- ?>
 <!-- 40行目付近のヒーローセクション開始タグを変更 -->
-<section class="medi-hero-section medi-hero-section--fullscreen" 
-    style="background-image: url('<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png');"
-    data-mobile-bg="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero_mobile.png">
+<section class="medi-hero-section medi-hero-section--fullscreen medi-hero-section--video">
+    <!-- デスクトップ用動画背景 -->
+    <div class="medi-hero-video-container">
+        <video class="medi-hero-video" autoplay muted playsinline>
+            <source src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.mp4" type="video/mp4">
+            <!-- フォールバック画像 -->
+            <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png" alt="ヒーロー画像" />
+        </video>
+    </div>
     
-    <!-- モバイル用ヒーロー画像 -->
+    <!-- モバイル用ヒーロー画像（変更なし） -->
     <div class="medi-hero-mobile-image">
         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero_mobile.png" alt="ヒーロー画像" />
-    </div>
-    
-    <!-- 動的背景要素 -->
-    <div class="medi-hero-section__bg-effects">
-        <div class="bg-particle bg-particle--1"></div>
-        <div class="bg-particle bg-particle--2"></div>
-        <div class="bg-particle bg-particle--3"></div>
-        <div class="bg-particle bg-particle--4"></div>
-        <div class="bg-particle bg-particle--5"></div>
-    </div>
-    
-    <!-- 光のライン -->
-    <div class="light-lines">
-        <div class="light-line light-line--1"></div>
-        <div class="light-line light-line--2"></div>
-        <div class="light-line light-line--3"></div>
     </div>
         
         <div class="container medi-hero-section__container">

@@ -25,68 +25,26 @@ if (! $dp_options) $dp_options = get_desing_plus_option(); // 親テーマのオ
             </div>
 
             <div class="site-footer-custom__nav-widgets">
-                <div class="footer-category-widget">
-                    <h3 class="footer-category-widget__title">カテゴリ</h3>
-                    <?php
-                    if (has_nav_menu('footer_category_menu')) { // 'footer_category_menu' というメニュー位置を登録・設定した場合
-                        wp_nav_menu(array(
-                            'theme_location' => 'footer_category_menu',
-                            'container' => false,
-                            'menu_class' => 'footer-category-widget__menu',
-                            'depth' => 1, // 階層は1階層のみ
-                        ));
-                    } else {
-                        // 代替コンテンツ (例)
-                        echo '<ul>';
-                        echo '<li><a href="#">地域から選ぶ (仮)</a></li>';
-                        echo '<li><a href="#">ココロで選ぶ (仮)</a></li>';
-                        echo '<li><a href="#">シチュエーションで選ぶ (仮)</a></li>';
-                        echo '<li><a href="#">ジャンルで選ぶ (仮)</a></li>';
-                        echo '</ul>';
-                    }
-                    ?>
-                </div>
-
-                <div class="footer-category-widget">
-                    <h3 class="footer-category-widget__title">サイト情報</h3>
-                     <?php
-                    if (has_nav_menu('footer_sitemap_menu')) { // 'footer_sitemap_menu' というメニュー位置
-                        wp_nav_menu(array(
-                            'theme_location' => 'footer_sitemap_menu',
-                            'container' => false,
-                            'menu_class' => 'footer-category-widget__menu',
-                            'depth' => 1,
-                        ));
-                    } else {
-                        echo '<ul>';
-                        echo '<li><a href="#">サイトについて (仮)</a></li>';
-                        echo '<li><a href="#">ご利用ガイド (仮)</a></li>';
-                        echo '<li><a href="#">店舗オーナー様へ (仮)</a></li>';
-                        echo '<li><a href="#">お問い合わせ (仮)</a></li>';
-                        echo '</ul>';
-                    }
-                    ?>
-                </div>
-
-                <div class="footer-category-widget">
-                    <h3 class="footer-category-widget__title">サポート</h3>
-                    <?php
-                    if (has_nav_menu('footer_support_menu')) { // 'footer_support_menu' というメニュー位置
-                        wp_nav_menu(array(
-                            'theme_location' => 'footer_support_menu',
-                            'container' => false,
-                            'menu_class' => 'footer-category-widget__menu',
-                            'depth' => 1,
-                        ));
-                    } else {
-                        echo '<ul>';
-                        echo '<li><a href="#">よくある質問 (仮)</a></li>';
-                        echo '<li><a href="#">プライバシーポリシー (仮)</a></li>';
-                        echo '<li><a href="#">利用規約 (仮)</a></li>';
-                        echo '</ul>';
-                    }
-                    ?>
-                </div>
+                <!-- 修正後 -->
+<div class="footer-category-widget">
+    <h3 class="footer-category-widget__title">メニュー</h3>
+    <?php
+    if (has_nav_menu('primary')) { // ヘッダーと同じ 'primary' メニューを使用
+        wp_nav_menu(array(
+            'theme_location' => 'primary',
+            'container' => false,
+            'menu_class' => 'footer-category-widget__menu',
+            'depth' => 1, // 階層は1階層のみ
+        ));
+    } else {
+        // 代替コンテンツ（primaryメニューが設定されていない場合）
+        echo '<ul class="footer-category-widget__menu">';
+        echo '<li><a href="' . esc_url(home_url('/')) . '">ホーム</a></li>';
+        echo '<li><a href="' . esc_url(get_post_type_archive_link('store')) . '">店舗一覧</a></li>';
+        echo '</ul>';
+    }
+    ?>
+</div>
             </div>
 
         </div>
