@@ -46,15 +46,6 @@ function medi_gensen_child_enqueue_assets() {
             true
         );
 
-            // ヘッダースクロール制御
-    wp_enqueue_script(
-        'header-scroll',
-        get_stylesheet_directory_uri() . '/js/header-scroll.js',
-        array('jquery'),
-        wp_get_theme()->get('Version'),
-        true
-    );
-
          // ヒーロー動画制御スクリプトを追加
     wp_enqueue_script(
         'medi-hero-video-js',

@@ -3612,6 +3612,24 @@ body.admin-bar .site-header-custom.is-fixed-header {
   .mobile-menu-toggle {
     display: none !important;
   }
+
+  .home .site-header-custom__logo-img {
+    content: url('assets/images/logo.gif');
+    height: px !important; /* 35pxから60pxに拡大 */
+    width: auto !important;
+    max-width: 250px; /* 最大幅を設定 */
+}
+
+/* ロゴリンクエリアも調整 */
+.home .site-header-custom__logo-link {
+    display: flex;
+    align-items: center;
+}
+
+/* ヘッダー全体の高さも調整 */
+.home .site-header-custom {
+    padding: 10px 0; /* 12pxから15pxに */
+}
 }
 
 /* --- medi-recommend-sectionのカードサイズ調整 --- */
