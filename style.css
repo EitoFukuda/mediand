@@ -324,12 +324,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 .medi-hero-video-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 0;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
 }
 
 .medi-hero-video {
@@ -343,12 +339,35 @@ body.admin-bar .site-header-custom.is-fixed-header {
     transform: translate(-50%, -50%);
     object-fit: cover;
     z-index: 1;
+    opacity: 1;
+    transition: opacity 0.5s ease;
 }
 
 /* 動画背景の場合はJSアニメーションを無効化 */
 .medi-hero-section--video .medi-hero-section__bg-effects,
 .medi-hero-section--video .light-lines {
     display: none !important;
+}
+
+/* フォールバック背景 */
+.medi-hero-fallback-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* 動画読み込み失敗時 */
+.medi-hero-video:not([src]) + .medi-hero-fallback-bg,
+.medi-hero-video[src=""] + .medi-hero-fallback-bg {
+    opacity: 1;
 }
 
 .medi-hero-section--fullscreen {
@@ -500,6 +519,8 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* ヒーローコンテンツ */
 .medi-hero-section__container {
+    position: relative;
+    z-index: 2; /* 検索フォームを動画より前に */
     height: 100%;
     min-height: 100vh;
     display: flex;
@@ -507,8 +528,6 @@ body.admin-bar .site-header-custom.is-fixed-header {
     justify-content: flex-end;
     align-items: center;
     padding: 60px 20px 0 20px;
-    position: relative;
-    z-index: 10;
 }
 
 .medi-hero-section__content-bottom {
@@ -535,7 +554,7 @@ body.admin-bar .site-header-custom.is-fixed-header {
 
 /* 検索フォーム */
 .search-form-inner {
-    background: rgba(20, 20, 40, 0.65);
+    background: rgba(20, 20, 40, 0.35); /* 透け感を強くする */
     backdrop-filter: blur(30px);
     border-radius: 20px;
     padding: 30px;
@@ -2334,6 +2353,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
     display: none !important;
 }
 
+.medi-hero-fallback-bg {
+    display: none !important;
+}
+
 .medi-mobile-search-form .search-form-inner {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -3706,4 +3729,10 @@ body.admin-bar .site-header-custom.is-fixed-header {
         margin-top: -50px;
         padding-top: 130px;
     }
+}
+
+@media (min-width: 769px) {
+  .medi-hero-video-container {
+    display: block !important;
+  }
 }

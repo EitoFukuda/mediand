@@ -1,0 +1,17 @@
+# 動画ファイルのMIMEタイプ設定
+AddType video/mp4 .mp4
+AddType video/webm .webm
+AddType video/ogg .ogg
+
+# キャッシュ設定
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType video/mp4 "access plus 1 month"
+    ExpiresByType video/webm "access plus 1 month"
+</IfModule>
+
+# 圧縮設定
+<IfModule mod_deflate.c>
+    SetOutputFilter DEFLATE
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|mp4|webm|ogg)$ no-gzip dont-vary
+</IfModule>

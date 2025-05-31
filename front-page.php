@@ -25,15 +25,17 @@ $images_base_path = get_stylesheet_directory_uri() . '/assets/images/';
 <div class="homepage-wrapper">
     
 <?php // --- フルスクリーンヒーローセクション --- ?>
-<!-- 40行目付近のヒーローセクション開始タグを変更 -->
 <section class="medi-hero-section medi-hero-section--fullscreen medi-hero-section--video">
     <!-- デスクトップ用動画背景 -->
     <div class="medi-hero-video-container">
-        <video class="medi-hero-video" autoplay muted playsinline>
+        <video class="medi-hero-video" autoplay muted playsinline loop preload="metadata" poster="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png">
             <source src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.mp4" type="video/mp4">
+            <source src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.webm" type="video/webm">
             <!-- フォールバック画像 -->
             <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png" alt="ヒーロー画像" />
         </video>
+        <!-- 動画読み込みエラー時の背景画像 -->
+        <div class="medi-hero-fallback-bg" style="background-image: url('<?php echo get_stylesheet_directory_uri(); ?>/assets/images/front_hero.png');"></div>
     </div>
     
     <!-- モバイル用ヒーロー画像（変更なし） -->

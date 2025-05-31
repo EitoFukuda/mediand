@@ -800,4 +800,23 @@ function medi_breadcrumb_structured_data() {
     }
 }
 add_action('wp_head', 'medi_breadcrumb_structured_data');
+
+/**
+ * 動画ファイルのMIMEタイプを追加
+ */
+function medi_add_video_mime_types($mimes) {
+    $mimes['mp4'] = 'video/mp4';
+    $mimes['webm'] = 'video/webm';
+    $mimes['ogg'] = 'video/ogg';
+    return $mimes;
+}
+add_filter('upload_mimes', 'medi_add_video_mime_types');
+
+/**
+ * 動画ファイルのアップロードサイズ制限を緩和
+ */
+function medi_increase_upload_size($bytes) {
+    return 50 * 1024 * 1024; // 50MB
+}
+add_filter('upload_size_limit', 'medi_increase_upload_size');
 ?>
