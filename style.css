@@ -222,6 +222,31 @@ body.admin-bar .site-header-custom.is-fixed-header {
     width: 100%;
 }
 
+/* フロントページ専用ヘッダースタイル（PC版のみ） */
+@media (min-width: 993px) {
+    .home .site-header-custom {
+        background-image: none !important;
+        background-color: transparent !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    /* スクロール時の背景変化 */
+    .home .site-header-custom.scrolled {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* フロントページのロゴをGIFに変更 */
+    .home .site-header-custom__logo-img {
+        content: url('assets/images/logo.gif');
+    }
+}
+
 /* ========================================================================
    3. フッター
 ======================================================================== */
